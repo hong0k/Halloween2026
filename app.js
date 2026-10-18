@@ -96,7 +96,7 @@ function drawBasicDetails(){
   });
   ctx.textAlign='center';
 }
-function draw() {
+function draw(forExport=false) {
   ctx.fillStyle=frame==='halloween'?'#392342':basicPalettes[basicStyle].paper;ctx.fillRect(0,0,1200,1560);
   const theme=document.documentElement.dataset.theme||'lime';
   const backgroundPath=frame==='halloween'?config?.backgrounds?.halloween?.[theme]:config?.backgrounds?.[frame];
@@ -155,7 +155,7 @@ function draw() {
   ctx.restore();if(frame==='basic')drawBasicDetails();
   const overlay=assets.get(config?.overlays[frame==='basic'?'together':frame]);if(overlay)ctx.drawImage(overlay,0,0,1200,1560);
   ctx.fillStyle=frame==='halloween'?(getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim()||'#f4d5b3'):basicPalettes[basicStyle].muted;ctx.font='24px sans-serif';
-  ctx.fillText($('caption').value.trim(),600,1470,1080);
+  ctx.fillText($('caption').value.trim()||(forExport===true?'':'문구를 입력해주세요. (선택사항)'),600,1470,1080);
   ctx.font='16px sans-serif';ctx.fillText('HONGOK FILM  ·  '+new Date().toLocaleDateString('ko-KR'),600,1515);
   const count=photos.filter(Boolean).length;$('progress').textContent=`${count} / 4`;$('download').disabled=count!==4||busy;$('share').disabled=count!==4||busy;
   renderCameraCharacter();
@@ -206,7 +206,11 @@ document.querySelectorAll('[data-basic]').forEach(button=>button.onclick=()=>{
   draw();
 });
 function exportFormat(){const jpg=$('format').value==='jpg';return {extension:jpg?'jpg':'png',type:jpg?'image/jpeg':'image/png'};}
-const blob=(type)=>new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('이미지를 만들지 못했어요.')),type,0.95));
+function blob(type){
+  const output=document.createElement('canvas');output.width=canvas.width;output.height=canvas.height;
+  try{draw(true);output.getContext('2d').drawImage(canvas,0,0);}finally{draw();}
+  return new Promise((resolve,reject)=>output.toBlob(b=>b?resolve(b):reject(new Error('이미지를 만들지 못했어요.')),type,0.95));
+}
 $('download').onclick=async()=>{try{const format=exportFormat();const image=await blob(format.type);const url=URL.createObjectURL(image);const a=document.createElement('a');a.href=url;a.download=`plot-${frame==='basic'?basicStyle:frame}-${mode}-${Date.now()}.${format.extension}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);status(`${format.extension.toUpperCase()} 이미지 저장을 요청했어요. 모바일에서 저장이 어렵다면 이미지 공유를 이용해주세요.`);}catch{status('이미지 저장에 실패했어요. 다시 시도해주세요.');}};
 function updateShare(){const format=exportFormat();$('share').hidden=!(navigator.canShare&&navigator.canShare({files:[new File([''],`photo.${format.extension}`,{type:format.type})]}));}
 $('format').onchange=updateShare;updateShare();
