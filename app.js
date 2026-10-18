@@ -242,13 +242,21 @@ $('remove').onclick=()=>{if($('edit-layer').value==='character')customPoses[sele
 $('reset').onclick=()=>{if((photos.some(Boolean)||customPoses.some(Boolean))&&!window.confirm('추가한 사진·내 캐릭터·문구를 모두 지울까요?'))return;photos.fill(null);customPoses.fill(null);$('caption').value='';select(0);draw();status('새로운 추억을 시작해요.');};
 $('caption').oninput=draw;
 document.querySelectorAll('.mode').forEach(el=>el.onclick=()=>{mode=el.dataset.mode;document.querySelectorAll('.mode').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});$('character-section').hidden=mode!=='together';$('camera-guide').hidden=mode!=='together';updateCharacterUI();select(selected);draw();updateCameraLabel();});
-document.querySelectorAll('.frame').forEach(el=>el.onclick=()=>{frame=el.dataset.frame;boxes=frame==='miniroom'?wideBoxes:fourBoxes;selected=Math.min(selected,boxes.length-1);buildSlots();select(selected);updateLayoutCopy();$('basic-style-panel').hidden=frame!=='basic';$('cyworld-options').hidden=frame!=='miniroom';document.querySelectorAll('.frame').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});draw();updateCameraLabel();});
-document.querySelectorAll('[data-basic]').forEach(button=>button.onclick=()=>{
-  basicStyle=button.dataset.basic;
-  document.querySelectorAll('[data-basic]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
+function selectFrame(nextFrame){
+  frame=nextFrame;boxes=frame==='miniroom'?wideBoxes:fourBoxes;
+  selected=Math.min(selected,boxes.length-1);buildSlots();select(selected);updateLayoutCopy();
+  $('basic-style-panel').hidden=frame!=='basic';$('cyworld-options').hidden=frame!=='miniroom';
+  document.querySelectorAll('.frame').forEach(b=>{const active=b.dataset.frame===frame;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
+  draw();updateCameraLabel();
+}
+function selectBasicStyle(style){
+  basicStyle=style;
+  document.querySelectorAll('[data-basic]').forEach(b=>{const active=b.dataset.basic===style;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
   $('basic-style-note').textContent={white:'화이트 프레임 · 사진의 원래 색상을 유지해요.',black:'블랙 프레임 · 사진의 원래 색상을 유지해요.',mono:'모노크롬 프레임 · 사진과 캐릭터를 흑백으로 담아요.'}[basicStyle];
   draw();
-});
+}
+document.querySelectorAll('.frame').forEach(el=>el.onclick=()=>selectFrame(el.dataset.frame));
+document.querySelectorAll('[data-basic]').forEach(button=>button.onclick=()=>selectBasicStyle(button.dataset.basic));
 function updateLayoutCopy(){
   const two=boxes.length===2;
   $('character-upload-note').innerHTML=`투명 PNG를 추천해요. 일반 이미지는 배경까지 표시됩니다.<br>1장을 올리면 ${two?'두':'네'} 칸에 적용하고, 여러 장은 순서대로 넣어요.`;
@@ -362,7 +370,8 @@ function setTheme(theme){
   document.querySelectorAll('.theme-picker button').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.theme===theme)));
   document.querySelector('meta[name="theme-color"]').content={lime:'#1b1622',pumpkin:'#1d0d0a',pink:'#191919',cyworld:'#fffaf5',simple:'#ffffff'}[theme];
   try{localStorage.setItem('hongok-theme',theme);}catch{}
-  draw();
+  if(theme==='simple')selectBasicStyle('white');
+  selectFrame(theme==='simple'?'basic':theme==='cyworld'?'miniroom':'halloween');
 }
 document.querySelectorAll('.theme-picker button').forEach(button=>button.onclick=()=>setTheme(button.dataset.theme));
 try{setTheme(localStorage.getItem('hongok-theme')||'lime');}catch{setTheme('lime');}
