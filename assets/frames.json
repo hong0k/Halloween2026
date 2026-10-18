@@ -64,5 +64,12 @@
   },
   "decoration_sources": {
     "pink": "assets/pink-ornaments-source.png"
+  },
+  "footer_colors": {
+    "halloween": {
+      "lime": "#e1ff07",
+      "pumpkin": "#ff7200",
+      "pink": "#faa0c9"
+    }
   }
 }
