@@ -374,4 +374,4 @@ function setTheme(theme){
   selectFrame(theme==='simple'?'basic':theme==='cyworld'?'miniroom':'halloween');
 }
 document.querySelectorAll('.theme-picker button').forEach(button=>button.onclick=()=>setTheme(button.dataset.theme));
-try{setTheme(localStorage.getItem('hongok-theme')||'lime');}catch{setTheme('lime');}
+setTheme('simple');
