@@ -1,4 +1,4 @@
-# PLOT PHOTO CLUB
+# 홍옥필름
 
 PC와 모바일에서 사용하는 네컷 사진 웹앱입니다. 정적 HTML/CSS/JavaScript로 동작하며 사용자 사진을 서버로 전송하지 않습니다.
 
