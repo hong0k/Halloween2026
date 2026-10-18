@@ -81,19 +81,28 @@ function drawBasicHeader(){
   ctx.beginPath();ctx.moveTo(60,133);ctx.lineTo(1140,133);ctx.stroke();
 }
 function drawBasicDetails(){
-  const p=basicPalettes[basicStyle];ctx.fillStyle=p.muted;ctx.font='12px monospace';
-  boxes.forEach((b,i)=>{
-    // Keep the rotated film markings centered inside the outer 60px gutters.
-    const left=i%2===0;
-    ctx.save();ctx.translate(left?30:1170,b.y+b.h/2);ctx.rotate(left?-Math.PI/2:Math.PI/2);
-    ctx.textBaseline='middle';
-    ctx.textAlign='left';ctx.fillText('REC ● / '+String(i+1).padStart(2,'0'),-b.h/2+20,0);
-    ctx.textAlign='right';ctx.fillText((basicStyle==='mono'?'B&W 35mm':'35mm')+' / FRAME '+String(i+1).padStart(2,'0'),b.h/2-20,0);
-    ctx.restore();
-    if(basicStyle==='mono'){
-      ctx.strokeStyle='#a2a29e';ctx.lineWidth=2;ctx.strokeRect(b.x-4,b.y-4,b.w+8,b.h+8);
-    }
-  });
+  const p=basicPalettes[basicStyle];
+  function text(value,x,size=13){ctx.font=`${size>=18?'bold ':''}${size}px monospace`;ctx.fillStyle=size>=18?p.ink:p.muted;ctx.fillText(value,x,0);}
+  function arrow(x){ctx.fillStyle=p.ink;ctx.beginPath();ctx.moveTo(x,-5);ctx.lineTo(x+18,0);ctx.lineTo(x,5);ctx.closePath();ctx.fill();}
+  function barcode(x,width,seed){
+    ctx.fillStyle=p.muted;
+    const bars=[2,1,4,2,1,3,1,5,2,1,3,2,4,1,2,3];let offset=0,i=seed;
+    while(offset<width){const w=Math.min(bars[i++%bars.length],width-offset);ctx.fillRect(x+offset,-9,w,i%3===0?12:18);offset+=w+(i%3+2);}
+  }
+  // Different markings and spacing on each edge, all inside the 60px gutters.
+  ctx.save();ctx.translate(30,785);ctx.rotate(-Math.PI/2);ctx.textAlign='left';ctx.textBaseline='middle';
+  text('01A',-590,19);arrow(-525);barcode(-475,115,1);
+  text(basicStyle==='mono'?'B&W / 400':'35mm / 400',-285,12);
+  text('03',-30,18);barcode(90,70,5);arrow(235);text('EXPOSURE 04',310,11);text('04A',535,18);
+  ctx.restore();
+  ctx.save();ctx.translate(1170,785);ctx.rotate(Math.PI/2);ctx.textAlign='left';ctx.textBaseline='middle';
+  barcode(-595,68,8);text('02',-490,20);text('FILM / 2026',-365,11);arrow(-170);
+  barcode(-100,135,3);text('02A',125,17);text(basicStyle==='mono'?'MONO  •  35':'COLOR NEG.  •  35',270,11);arrow(535);
+  ctx.restore();
+  if(basicStyle==='mono'){
+    ctx.strokeStyle='#a2a29e';ctx.lineWidth=2;
+    boxes.forEach(b=>ctx.strokeRect(b.x-4,b.y-4,b.w+8,b.h+8));
+  }
   ctx.textAlign='center';
 }
 function draw(forExport=false) {
