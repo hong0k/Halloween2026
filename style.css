@@ -65,5 +65,5 @@ header,main{position:relative}
 [data-theme="simple"] header,[data-theme="simple"] footer,[data-theme="simple"] .theme-picker,[data-theme="simple"] .download-area{border-color:#ddd}
 [data-theme="simple"] #status,[data-theme="simple"] #camera-status,[data-theme="simple"] #camera-label{color:#444}
 [data-theme="simple"] input::placeholder{color:#777}
-[data-theme="simple"] .theme-picker button::before{background:#171717}
+
 [data-theme="simple"] input[type=range],[data-theme="simple"] input[type=checkbox]{accent-color:#171717}
