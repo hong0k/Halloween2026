@@ -114,9 +114,9 @@ function drawMiniroomHeader(){
   ctx.textAlign='center';ctx.fillStyle='#8b7f7f';ctx.font='24px "Hongok Hand",sans-serif';
   ctx.fillText('ⓛⓞⓥⓔ  ⓨⓞⓤ  ·  그때 그 감성',600,63);
   ctx.fillStyle='#51484b';ctx.font='49px "Hongok Hand",sans-serif';
-  ctx.fillText('그 시절, 우린 주인공이었지…♡',600,139);
+  ctx.fillText('너랑 찍은 오늘, 즐겨찾기..♡',600,139);
   ctx.fillStyle='#a5969a';ctx.font='26px "Hongok Hand",sans-serif';
-  ctx.fillText('너와 나의 이야기를 저장합니다  ˘◡˘',600,198);
+  ctx.fillText('그 시절, 우린 주인공이었지',600,198);
   ctx.fillStyle='#b6aaad';ctx.font='14px monospace';ctx.fillText('HONGOK FILM  /  LOVE STORY',600,248);
   ctx.strokeStyle='#e5dce0';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(480,223);ctx.lineTo(720,223);ctx.stroke();
@@ -129,7 +129,7 @@ function drawMiniroomDetails(){
     ctx.strokeRect(b.x-1,b.y-1,b.w+2,b.h+2);
     ctx.textAlign='left';ctx.fillStyle='#a4969d';ctx.font='20px "Hongok Hand",sans-serif';ctx.fillText(String(i+1).padStart(2,'0')+'。',b.x,b.y+b.h+34);
     ctx.textAlign='center';ctx.fillStyle='#857780';ctx.font='29px "Hongok Hand",sans-serif';
-    ctx.fillText(i===0?'너랑 찍은 오늘, 즐겨찾기…♡':'우리의 이야기는 아직 진행 중。',600,b.y+b.h+40);
+    ctx.fillText(i===0?'남푠 ♡ 마누라 바람피면 주거 ㅋㅋ':'우리의 이야기는 아직 진행 중。',600,b.y+b.h+40);
   });
   ctx.textAlign='center';ctx.fillStyle='#b2a3ad';ctx.font='24px "Hongok Hand",sans-serif';ctx.fillText('┌  오늘의 우리를, 오래오래 기억할게  ┘',600,1413);
 }
