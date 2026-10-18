@@ -76,13 +76,13 @@ const basicPalettes={
 function drawBasicHeader(){
   const p=basicPalettes[basicStyle];ctx.fillStyle=p.ink;
   ctx.textAlign='center';ctx.font=basicStyle==='white'?'bold 48px Georgia,serif':basicStyle==='black'?'bold 43px sans-serif':'italic 46px Georgia,serif';
-  ctx.fillText('HONGOK FILM',600,110);
+  ctx.save();ctx.textBaseline='middle';ctx.fillText('HONGOK FILM',600,60);ctx.restore();
   ctx.strokeStyle=basicStyle==='black'?'#555555':'#aeaeaa';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(60,133);ctx.lineTo(1140,133);ctx.stroke();
 }
 function drawBasicDetails(){
   const p=basicPalettes[basicStyle];
-  function text(value,x,size=12){ctx.font=`${size}px monospace`;ctx.fillStyle=p.muted;ctx.fillText(value,x,0);}
+  function text(value,x,size=12){ctx.font=`bold ${size+2}px monospace`;ctx.fillStyle=p.muted;ctx.fillText(value,x,0);}
   function marker(x,number){
     ctx.fillStyle=p.ink;ctx.beginPath();ctx.moveTo(x,-3);ctx.lineTo(x+12,0);ctx.lineTo(x,3);ctx.closePath();ctx.fill();
     text(number,x+19,11);
