@@ -22,17 +22,31 @@ function draw() {
   const backgroundPath=frame==='halloween'?config?.backgrounds?.halloween?.[theme]:config?.backgrounds?.[frame];
   const background=assets.get(backgroundPath);if(background){
     ctx.drawImage(background,0,0,1200,1560);
-    const ghostLayout={
-      'assets/background-01.png':{y:665,h:85,blank:750}
-    }[backgroundPath?.split('?')[0]];
-    if(frame==='halloween'&&ghostLayout){
-      // Keep each sprite fully inside the 60px gutter, at the photo row gap.
-      const {y,h,blank}=ghostLayout;
-      for(const x of [10,1015]){
-        ctx.drawImage(background,x,blank,75,1,x/1100*1200,y/1430*1560,75/1100*1200,h/1430*1560);
+    const assetName=backgroundPath?.split('?')[0];
+    const adjusted=['assets/background-01.png','assets/background-02.png'].includes(assetName);
+    if(frame==='halloween'&&adjusted){
+      // Map the entire decorative edge strip into each 60px gutter, with 4px inset.
+      // Source art is wider than the gutter; scaling keeps complete objects visible.
+      const iw=background.naturalWidth,ih=background.naturalHeight;
+      if(assetName==='assets/background-01.png'){
+        for(const x of [10,1015])ctx.drawImage(background,x/1100*iw,750/1430*ih,75/1100*iw,1,x/1100*1200,665/1430*1560,75/1100*1200,85/1430*1560);
       }
-      ctx.drawImage(background,10,y,75,h,5,765,48,45);
-      ctx.drawImage(background,1015,y,75,h,1147,765,48,45);
+      const sy=160/1560*ih,sh=1250/1560*ih,sw=90/1100*iw;
+      for(const [sx,dx] of [[0,4],[iw-sw,1144]]){
+        const cleanX=(sx===0?100:1000)/1100*iw;
+        ctx.drawImage(background,cleanX,sy,1,sh,dx-4,160,60,1250);
+        ctx.save();ctx.beginPath();ctx.rect(dx,160,52,1250);ctx.clip();
+        ctx.drawImage(background,sx,sy,sw,sh,dx,160,52,1250);
+        if(assetName==='assets/background-01.png'){
+          // Remove the skulls at their generated height before placing them at Y≈800.
+          ctx.drawImage(background,sx,750/1430*ih,sw,1,dx,665/1430*1560,52,85/1430*1560);
+        }
+        ctx.restore();
+      }
+      if(assetName==='assets/background-01.png'){
+        ctx.drawImage(background,10/1100*iw,665/1430*ih,75/1100*iw,85/1430*ih,6,765,46,45);
+        ctx.drawImage(background,1015/1100*iw,665/1430*ih,75/1100*iw,85/1430*ih,1148,765,46,45);
+      }
     }
   }
   ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';if(frame!=='halloween')ctx.fillText('HONGOK FILM',600,84);
