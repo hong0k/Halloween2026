@@ -121,7 +121,7 @@ function drawMiniroomHeader(){
   ctx.strokeStyle='#e5dce0';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(480,223);ctx.lineTo(720,223);ctx.stroke();
   ctx.fillStyle='#b6a3ad';ctx.font='28px "Hongok Hand",sans-serif';
-  ctx.fillText('♡',29,550);ctx.fillText('˚',1170,633);ctx.fillText('˚',29,1060);ctx.fillText('♡',1170,1175);
+  ctx.fillText('♡',50,525);ctx.fillText('˚',1150,525);ctx.fillText('˚',50,1075);ctx.fillText('♡',1150,1075);
 }
 function drawMiniroomDetails(){
   ctx.strokeStyle='#e2dcdf';ctx.lineWidth=1;
