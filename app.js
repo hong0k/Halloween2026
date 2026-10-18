@@ -16,6 +16,39 @@ function drawPhoto(photo,b) {
   ctx.save();ctx.beginPath();ctx.rect(b.x,b.y,b.w,b.h);ctx.clip();
   ctx.translate(b.x+b.w/2+photo.x,b.y+b.h/2+photo.y);ctx.scale(photo.mirror?-1:1,1);ctx.drawImage(photo.image,-iw/2,-ih/2,iw,ih);ctx.restore();
 }
+// Keep original artwork untouched. Isolate the existing bright corner ornaments
+// from the earlier decorated source once, excluding its regenerated title/background.
+let pinkOrnaments;
+function drawPinkDecorations(){
+  const source=assets.get(config?.decoration_sources?.pink);
+  if(source&&!pinkOrnaments){
+    pinkOrnaments=document.createElement('canvas');
+    pinkOrnaments.width=source.naturalWidth;pinkOrnaments.height=source.naturalHeight;
+    const c=pinkOrnaments.getContext('2d');c.drawImage(source,0,0);
+    const pixels=c.getImageData(0,0,pinkOrnaments.width,pinkOrnaments.height);
+    for(let y=0;y<pinkOrnaments.height;y++)for(let x=0;x<pinkOrnaments.width;x++){
+      const i=(y*pinkOrnaments.width+x)*4;
+      const nx=x/pinkOrnaments.width,ny=y/pinkOrnaments.height;
+      const corner=(ny<0.135&&(nx<0.17||nx>0.86))||(ny>0.875&&(nx<0.20||nx>0.80));
+      const bright=pixels.data[i]>195&&pixels.data[i+1]>70&&pixels.data[i+2]>125;
+      if(!corner||!bright)pixels.data[i+3]=0;
+    }
+    c.putImageData(pixels,0,0);
+  }
+  // Muted wallpaper is a separate layer, below photos and outside the title band.
+  ctx.save();ctx.beginPath();ctx.rect(0,160,1200,1250);ctx.clip();
+  ctx.fillStyle='#b76b91';ctx.globalAlpha=0.14;
+  const bat=new Path2D('M-100 12 Q-85-35-110-55 Q-48-54-15-8 L-7-26 0-16 7-26 15-8 Q48-54 110-55 Q85-35 100 12 Q65-4 47 25 Q20 9 0 50 Q-20 9-47 25 Q-65-4-100 12Z');
+  for(const [x,y,scale,angle] of [[80,285,1.5,-.3],[1090,430,1.5,.25],[535,720,1.4,-.2],[55,1010,1.4,.1],[1110,1180,1.5,-.2]]){
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);ctx.fill(bat);ctx.restore();
+  }
+  const cross=new Path2D('M-12-90 L0-106 12-90 12-28 48-28 64-12 48 4 12 4 12 100 0 117-12 100-12 4-48 4-64-12-48-28-12-28Z');
+  for(const [x,y,angle] of [[470,360,0],[1070,740,.25],[710,1040,.2],[190,1260,-.2]]){
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fill(cross);ctx.restore();
+  }
+  ctx.restore();
+  if(pinkOrnaments)ctx.drawImage(pinkOrnaments,0,0,1200,1560);
+}
 function draw() {
   ctx.fillStyle=frame==='halloween'?'#392342':'#f6eee3';ctx.fillRect(0,0,1200,1560);
   const theme=document.documentElement.dataset.theme||'lime';
@@ -49,6 +82,7 @@ function draw() {
       }
     }
   }
+  if(frame==='halloween'&&theme==='pink')drawPinkDecorations();
   ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';if(frame!=='halloween')ctx.fillText('HONGOK FILM',600,84);
   boxes.forEach((b,i) => {
     ctx.fillStyle=frame==='halloween'?'#e5d4c7':'#ddd6df';ctx.fillRect(b.x,b.y,b.w,b.h);
@@ -144,8 +178,8 @@ window.addEventListener('pagehide',closeCamera);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&$('camera-dialog').open)$('camera-dialog').close();});
 async function init(){
   try{
-    const response=await fetch('./assets/frames.json?v=20261019.15');if(!response.ok)throw new Error('config');config=await response.json();
-    const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
+    const response=await fetch('./assets/frames.json?v=20261019.16');if(!response.ok)throw new Error('config');config=await response.json();
+    const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;[...$('characters').children].forEach((b,j)=>{b.classList.toggle('active',j===i);b.setAttribute('aria-pressed',String(j===i));});draw();updateCameraLabel();};$('characters').append(button);});
   }catch{status('캐릭터 설정을 불러오지 못했어요. 페이지를 새로고침해주세요.');}

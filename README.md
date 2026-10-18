@@ -42,3 +42,5 @@ python3 -m http.server 8000 --bind 0.0.0.0
 코드에 인증키가 필요하지 않습니다. 별도 빌드나 npm 의존성도 없습니다. 배포 계정 권한과 저장소 요금제에 따라 Pages 사용 가능 여부를 확인하세요.
 
 할로윈 배경은 `backgrounds.halloween`에서 화면 테마별로 연결합니다. `pumpkin`은 `assets/background-02.png`, `lime`은 `assets/background-01.png`, `pink`는 `assets/background-03.png`입니다. 이미지는 사진 아래에 배치됩니다. 라임 배경의 해골은 앱에서 좌우 여백에 맞춰 합성합니다. 펌킨 배경의 유령과 박쥐는 왼쪽 상단에 배치되어 별도 위치 보정이 없습니다.
+
+빈티지 핑크의 `background-03.png`는 사용자가 제공한 `background-03-original.png`의 복사본입니다. 원본 제목과 그라데이션을 재생성하지 않습니다. `decoration_sources.pink`에서 기존의 밝은 모서리 장식만 분리해 사진 아래에 합성하고, 은은한 무늬는 별도 캔버스 레이어로 그립니다. 제목 영역에는 장식을 그리지 않습니다.
