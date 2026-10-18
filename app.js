@@ -18,6 +18,7 @@ function drawPhoto(photo,b) {
 }
 function draw() {
   ctx.fillStyle=frame==='halloween'?'#392342':'#f6eee3';ctx.fillRect(0,0,1200,1560);
+  const background=assets.get(config?.backgrounds?.[frame]);if(background)ctx.drawImage(background,0,0,1200,1560);
   ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';if(frame!=='halloween')ctx.fillText('HONGOK FILM',600,84);
   boxes.forEach((b,i) => {
     ctx.fillStyle=frame==='halloween'?'#e5d4c7':'#ddd6df';ctx.fillRect(b.x,b.y,b.w,b.h);
@@ -114,7 +115,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&$('camera-
 async function init(){
   try{
     const response=await fetch('./assets/frames.json');if(!response.ok)throw new Error('config');config=await response.json();
-    const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays)].filter(Boolean);
+    const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays),...Object.values(config.backgrounds??{})].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;[...$('characters').children].forEach((b,j)=>{b.classList.toggle('active',j===i);b.setAttribute('aria-pressed',String(j===i));});draw();updateCameraLabel();};$('characters').append(button);});
   }catch{status('캐릭터 설정을 불러오지 못했어요. 페이지를 새로고침해주세요.');}

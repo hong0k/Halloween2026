@@ -1,10 +1,61 @@
 {
   "characters": [
-    {"id":"kim","name":"김하사","poses":[null,null,null,null]},
-    {"id":"min","name":"민혜성","poses":[null,null,null,null]},
-    {"id":"yoon","name":"윤주원","poses":[null,null,null,null]},
-    {"id":"ok","name":"옥태석","poses":[null,null,null,null]},
-    {"id":"joo","name":"주대리","poses":[null,null,null,null]}
+    {
+      "id": "kim",
+      "name": "김하사",
+      "poses": [
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "min",
+      "name": "민혜성",
+      "poses": [
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "yoon",
+      "name": "윤주원",
+      "poses": [
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "ok",
+      "name": "옥태석",
+      "poses": [
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "joo",
+      "name": "주대리",
+      "poses": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
   ],
-  "overlays": {"together":null,"halloween":null}
+  "overlays": {
+    "together": null,
+    "halloween": null
+  },
+  "backgrounds": {
+    "halloween": "assets/halloween-background.png"
+  }
 }
