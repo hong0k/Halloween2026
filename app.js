@@ -105,29 +105,33 @@ function drawBasicDetails(){
   }
   ctx.textAlign='center';
 }
+function cyworldFilter(){
+  const amount=Number($('softness').value)/100;
+  return amount===0?'none':`brightness(${1+amount*.13}) contrast(${1-amount*.20}) saturate(${1-amount*.22}) blur(${amount*.65}px)`;
+}
 function drawMiniroomHeader(){
-  ctx.fillStyle='#f2eee7';ctx.fillRect(0,0,1200,1560);
-  ctx.strokeStyle='#c8bfb3';ctx.lineWidth=2;ctx.strokeRect(24,24,1152,1512);
-  ctx.save();ctx.setLineDash([5,5]);ctx.strokeStyle='#d6cfc4';ctx.strokeRect(36,36,1128,1488);ctx.restore();
-  ctx.textAlign='left';ctx.fillStyle='#e67d30';ctx.font='bold 21px sans-serif';ctx.fillText("TODAY'S MEMORY",60,88);
-  ctx.textAlign='right';ctx.fillStyle='#8c847b';ctx.font='16px monospace';ctx.fillText('MY PHOTO DIARY  /  02 CUTS',1140,88);
-  ctx.textAlign='left';ctx.fillStyle='#3d3a37';ctx.font='bold 43px sans-serif';ctx.fillText('우리의 작은 사진첩',60,161);
-  ctx.textAlign='right';ctx.fillStyle='#91887d';ctx.font='18px monospace';ctx.fillText('HONGOK FILM',1140,157);
-  ctx.fillStyle='#fffdf9';ctx.fillRect(48,205,1104,1180);ctx.strokeStyle='#c7c4bf';ctx.strokeRect(48,205,1104,1180);
-  ctx.fillStyle='#82b4c8';ctx.fillRect(48,205,1104,53);
-  ctx.textAlign='left';ctx.fillStyle='#ffffff';ctx.font='bold 20px sans-serif';ctx.fillText('▣  PHOTO ALBUM',70,240);
-  ctx.textAlign='right';ctx.font='18px monospace';ctx.fillText('−  □  ×',1130,240);
-  ctx.textAlign='center';
+  ctx.fillStyle='#fffdfb';ctx.fillRect(0,0,1200,1560);
+  ctx.textAlign='center';ctx.fillStyle='#8b7f7f';ctx.font='24px "Hongok Hand",sans-serif';
+  ctx.fillText('ⓛⓞⓥⓔ  ⓨⓞⓤ  ·  그때 그 감성',600,63);
+  ctx.fillStyle='#51484b';ctx.font='49px "Hongok Hand",sans-serif';
+  ctx.fillText('그 시절, 우린 주인공이었지…♡',600,139);
+  ctx.fillStyle='#a5969a';ctx.font='26px "Hongok Hand",sans-serif';
+  ctx.fillText('너와 나의 이야기를 저장합니다  ˘◡˘',600,198);
+  ctx.fillStyle='#b6aaad';ctx.font='14px monospace';ctx.fillText('HONGOK FILM  /  LOVE STORY',600,248);
+  ctx.strokeStyle='#e5dce0';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(480,223);ctx.lineTo(720,223);ctx.stroke();
+  ctx.fillStyle='#b6a3ad';ctx.font='28px "Hongok Hand",sans-serif';
+  ctx.fillText('♡',29,550);ctx.fillText('˚',1170,633);ctx.fillText('˚',29,1060);ctx.fillText('♡',1170,1175);
 }
 function drawMiniroomDetails(){
-  ctx.strokeStyle='#c4bfb7';ctx.lineWidth=2;
+  ctx.strokeStyle='#e2dcdf';ctx.lineWidth=1;
   boxes.forEach((b,i)=>{
     ctx.strokeRect(b.x-1,b.y-1,b.w+2,b.h+2);
-    ctx.textAlign='left';ctx.fillStyle='#e17c35';ctx.font='bold 17px monospace';ctx.fillText(String(i+1).padStart(2,'0')+' /',b.x,b.y+b.h+31);
-    ctx.fillStyle='#8d857b';ctx.font='17px sans-serif';ctx.fillText(i===0?'오늘의 한 장':'오래 간직할 순간',b.x+65,b.y+b.h+31);
-    ctx.textAlign='right';ctx.fillStyle='#a79c8e';ctx.font='15px monospace';ctx.fillText('♡ MY LITTLE MEMORY',b.x+b.w,b.y+b.h+31);
+    ctx.textAlign='left';ctx.fillStyle='#a4969d';ctx.font='20px "Hongok Hand",sans-serif';ctx.fillText(String(i+1).padStart(2,'0')+'。',b.x,b.y+b.h+34);
+    ctx.textAlign='center';ctx.fillStyle='#857780';ctx.font='29px "Hongok Hand",sans-serif';
+    ctx.fillText(i===0?'너랑 찍은 오늘, 즐겨찾기…♡':'우리의 이야기는 아직 진행 중。',600,b.y+b.h+40);
   });
-  ctx.textAlign='center';ctx.fillStyle='#b3a797';ctx.font='16px monospace';ctx.fillText('… 소중한 순간을 스크랩했어요 …',600,1420);
+  ctx.textAlign='center';ctx.fillStyle='#b2a3ad';ctx.font='24px "Hongok Hand",sans-serif';ctx.fillText('┌  오늘의 우리를, 오래오래 기억할게  ┘',600,1413);
 }
 function draw(forExport=false) {
   ctx.fillStyle=frame==='halloween'?'#392342':basicPalettes[basicStyle].paper;ctx.fillRect(0,0,1200,1560);
@@ -165,7 +169,7 @@ function draw(forExport=false) {
   if(frame==='halloween'&&theme==='pink')drawPinkDecorations();
   if(frame==='miniroom')drawMiniroomHeader();
   ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';if(frame==='basic')drawBasicHeader();
-  ctx.save();if(frame==='basic'&&basicStyle==='mono')ctx.filter='grayscale(1)';
+  ctx.save();if(frame==='basic'&&basicStyle==='mono')ctx.filter='grayscale(1)';else if(frame==='miniroom')ctx.filter=cyworldFilter();
   boxes.forEach((b,i) => {
     ctx.fillStyle=frame==='halloween'?'#e5d4c7':frame==='miniroom'?'#e9e6df':basicPalettes[basicStyle].slot;ctx.fillRect(b.x,b.y,b.w,b.h);
     if(photos[i]) drawPhoto(photos[i],b);
@@ -184,11 +188,12 @@ function draw(forExport=false) {
         ctx.fillStyle='#55415e';ctx.font='bold 24px sans-serif';ctx.fillText(config?.characters[character].name??'',b.x+b.w*.79,b.y+b.h-70);ctx.font='16px sans-serif';ctx.fillText('캐릭터 준비 중',b.x+b.w*.79,b.y+b.h-38);ctx.restore();
       }
     }
+    if(frame==='miniroom'&&Number($('softness').value)>0){ctx.save();ctx.filter='none';ctx.globalAlpha=Number($('softness').value)/100*.10;ctx.fillStyle='#fff9f3';ctx.fillRect(b.x,b.y,b.w,b.h);ctx.restore();}
     if(frame==='halloween') {ctx.fillStyle='#633b6c';ctx.font='26px sans-serif';ctx.fillText(['✦','☾','☾','✦'][i],b.x+b.w-24,b.y+35);}
   });
   ctx.restore();if(frame==='basic')drawBasicDetails();if(frame==='miniroom')drawMiniroomDetails();
   const overlay=assets.get(config?.overlays[frame==='basic'?'together':frame]);if(overlay)ctx.drawImage(overlay,0,0,1200,1560);
-  ctx.fillStyle=frame==='halloween'?(getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim()||'#f4d5b3'):frame==='miniroom'?'#8d857b':basicPalettes[basicStyle].muted;ctx.font='24px sans-serif';
+  ctx.fillStyle=frame==='halloween'?(getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim()||'#f4d5b3'):frame==='miniroom'?'#8d857b':basicPalettes[basicStyle].muted;ctx.font=frame==='miniroom'?'29px "Hongok Hand",sans-serif':'24px sans-serif';
   ctx.fillText($('caption').value.trim()||(forExport===true?'':'문구를 입력해주세요. (선택사항)'),600,1470,1080);
   ctx.font='16px sans-serif';ctx.fillText('HONGOK FILM  ·  '+new Date().toLocaleDateString('ko-KR'),600,1515);
   const count=activePhotos().filter(Boolean).length;$('progress').textContent=`${count} / ${boxes.length}`;$('download').disabled=count!==boxes.length||busy;$('share').disabled=count!==boxes.length||busy;
@@ -236,7 +241,7 @@ $('remove').onclick=()=>{if($('edit-layer').value==='character')customPoses[sele
 $('reset').onclick=()=>{if((photos.some(Boolean)||customPoses.some(Boolean))&&!window.confirm('추가한 사진·내 캐릭터·문구를 모두 지울까요?'))return;photos.fill(null);customPoses.fill(null);$('caption').value='';select(0);draw();status('새로운 추억을 시작해요.');};
 $('caption').oninput=draw;
 document.querySelectorAll('.mode').forEach(el=>el.onclick=()=>{mode=el.dataset.mode;document.querySelectorAll('.mode').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});$('character-section').hidden=mode!=='together';$('camera-guide').hidden=mode!=='together';updateCharacterUI();select(selected);draw();updateCameraLabel();});
-document.querySelectorAll('.frame').forEach(el=>el.onclick=()=>{frame=el.dataset.frame;boxes=frame==='miniroom'?wideBoxes:fourBoxes;selected=Math.min(selected,boxes.length-1);buildSlots();select(selected);updateLayoutCopy();$('basic-style-panel').hidden=frame!=='basic';document.querySelectorAll('.frame').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});draw();updateCameraLabel();});
+document.querySelectorAll('.frame').forEach(el=>el.onclick=()=>{frame=el.dataset.frame;boxes=frame==='miniroom'?wideBoxes:fourBoxes;selected=Math.min(selected,boxes.length-1);buildSlots();select(selected);updateLayoutCopy();$('basic-style-panel').hidden=frame!=='basic';$('cyworld-options').hidden=frame!=='miniroom';document.querySelectorAll('.frame').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});draw();updateCameraLabel();});
 document.querySelectorAll('[data-basic]').forEach(button=>button.onclick=()=>{
   basicStyle=button.dataset.basic;
   document.querySelectorAll('[data-basic]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
@@ -252,6 +257,7 @@ function updateLayoutCopy(){
   canvas.setAttribute('aria-label',two?'완성될 와이드 두컷 사진 미리보기':'완성될 네컷 사진 미리보기');
   document.querySelector('.preview-panel').setAttribute('aria-label',two?'두컷 미리보기':'네컷 미리보기');
 }
+$('softness').oninput=()=>{$('softness-value').textContent=$('softness').value+'%';draw();};
 function exportFormat(){const jpg=$('format').value==='jpg';return {extension:jpg?'jpg':'png',type:jpg?'image/jpeg':'image/png'};}
 function blob(type){
   const output=document.createElement('canvas');output.width=canvas.width;output.height=canvas.height;
@@ -268,7 +274,8 @@ function renderCameraCharacter(){
   document.querySelector('.camera-stage').style.aspectRatio=`${box.w}/${box.h}`;
   c.clearRect(0,0,box.w,box.h);
   const monochrome=frame==='basic'&&basicStyle==='mono';
-  $('video').style.filter=monochrome?'grayscale(1)':'none';c.filter=monochrome?'grayscale(1)':'none';
+  const filter=monochrome?'grayscale(1)':frame==='miniroom'?cyworldFilter():'none';
+  $('video').style.filter=filter;c.filter=filter;
   const custom=mode==='together'&&character==='custom'&&customPoses[selected];
   preview.hidden=!custom;
   $('camera-guide').hidden=mode!=='together'||Boolean(custom);
@@ -337,6 +344,7 @@ $('repeat-character').onclick=()=>{
   const pose=customPoses[selected];for(let i=0;i<4;i++)customPoses[i]={...pose};select(selected);draw();status('선택한 캐릭터를 모든 칸에 적용했어요.');
 };
 async function init(){
+  try{await document.fonts.load('29px "Hongok Hand"');}catch{}
   try{
     const response=await fetch('./assets/frames.json?v=20261019.19');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
