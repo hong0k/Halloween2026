@@ -67,3 +67,4 @@ header,main{position:relative}
 [data-theme="simple"] input::placeholder{color:#777}
 
 [data-theme="simple"] input[type=range],[data-theme="simple"] input[type=checkbox]{accent-color:#171717}
+#wide-fit-label{margin-top:16px}#character-fit{display:block;margin:9px 0;padding:8px;width:100%;background:var(--panel);color:var(--text-main);border:1px solid var(--border);border-radius:5px}#wide-fit-label small{display:block;line-height:1.8;font-size:10px;color:var(--text-muted)}

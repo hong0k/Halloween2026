@@ -22,16 +22,18 @@ function drawPhoto(photo,b) {
 }
 function editable(){return $('edit-layer').value==='character'&&character==='custom'&&mode==='together'?customPoses[selected]:photos[selected];}
 function drawCustomPose(pose,b,c=ctx){
-  const scale=Math.min(b.w*.48/pose.image.naturalWidth,b.h*.93/pose.image.naturalHeight)*pose.zoom;
+  const fillWide=frame==='miniroom'&&$('character-fit').value==='cover';
+  const scale=(fillWide?Math.max(b.w*.5/pose.image.naturalWidth,b.h/pose.image.naturalHeight):Math.min(b.w*.48/pose.image.naturalWidth,b.h*.93/pose.image.naturalHeight))*pose.zoom;
   const w=pose.image.naturalWidth*scale,h=pose.image.naturalHeight*scale;
-  c.save();c.beginPath();c.rect(b.x,b.y,b.w,b.h);c.clip();
-  c.translate(b.x+b.w*.76+pose.x,b.y+b.h-h/2+pose.y);c.scale(pose.mirror?-1:1,1);
+  c.save();c.beginPath();c.rect(fillWide?b.x+b.w*.5:b.x,b.y,fillWide?b.w*.5:b.w,b.h);c.clip();
+  c.translate(b.x+b.w*(fillWide?.75:.76)+pose.x,(fillWide?b.y+h/2:b.y+b.h-h/2)+pose.y);c.scale(pose.mirror?-1:1,1);
   c.drawImage(pose.image,-w/2,-h/2,w,h);c.restore();
 }
 function updateCharacterUI(){
   const custom=character==='custom';
   $('custom-character').setAttribute('aria-pressed',String(custom));
   $('custom-panel').hidden=!custom;
+  $('wide-fit-label').hidden=frame!=='miniroom';
   $('edit-layer-label').hidden=!custom||mode!=='together';
   if(!custom||mode!=='together')$('edit-layer').value='photo';
   [...$('characters').children].forEach((b,j)=>{b.classList.toggle('active',j===character);b.setAttribute('aria-pressed',String(j===character));});
@@ -266,6 +268,7 @@ function updateLayoutCopy(){
   canvas.setAttribute('aria-label',two?'완성될 와이드 두컷 사진 미리보기':'완성될 네컷 사진 미리보기');
   document.querySelector('.preview-panel').setAttribute('aria-label',two?'두컷 미리보기':'네컷 미리보기');
 }
+$('character-fit').onchange=()=>{draw();};
 $('softness').oninput=()=>{$('softness-value').textContent=$('softness').value+'%';draw();};
 function exportFormat(){const jpg=$('format').value==='jpg';return {extension:jpg?'jpg':'png',type:jpg?'image/jpeg':'image/png'};}
 function blob(type){
