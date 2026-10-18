@@ -75,8 +75,6 @@ const basicPalettes={
 };
 function drawBasicHeader(){
   const p=basicPalettes[basicStyle];ctx.fillStyle=p.ink;
-  ctx.textAlign='left';ctx.font='14px monospace';ctx.fillText('FRAME / '+{white:'01',black:'02',mono:'03'}[basicStyle],60,48);
-  ctx.textAlign='right';ctx.fillText(basicStyle==='mono'?'MONOCHROME SERIES':'FOUR MOMENTS, ONE STORY',1140,48);
   ctx.textAlign='center';ctx.font=basicStyle==='white'?'bold 48px Georgia,serif':basicStyle==='black'?'bold 43px sans-serif':'italic 46px Georgia,serif';
   ctx.fillText('HONGOK FILM',600,110);
   ctx.strokeStyle=basicStyle==='black'?'#555555':'#aeaeaa';ctx.lineWidth=1;
@@ -85,8 +83,13 @@ function drawBasicHeader(){
 function drawBasicDetails(){
   const p=basicPalettes[basicStyle];ctx.fillStyle=p.muted;ctx.font='12px monospace';
   boxes.forEach((b,i)=>{
-    ctx.textAlign='left';ctx.fillText('► '+String(i+1).padStart(2,'0'),b.x,b.y+b.h+19);
-    ctx.textAlign='right';ctx.fillText(basicStyle==='mono'?'MONO / MEMORY':'HONGOK / '+String(i+1).padStart(2,'0'),b.x+b.w,b.y+b.h+19);
+    // Keep the rotated film markings centered inside the outer 60px gutters.
+    const left=i%2===0;
+    ctx.save();ctx.translate(left?30:1170,b.y+b.h/2);ctx.rotate(left?-Math.PI/2:Math.PI/2);
+    ctx.textBaseline='middle';
+    ctx.textAlign='left';ctx.fillText('► '+String(i+1).padStart(2,'0'),-b.h/2+20,0);
+    ctx.textAlign='right';ctx.fillText(basicStyle==='mono'?'MONO / MEMORY':'HONGOK / '+String(i+1).padStart(2,'0'),b.h/2-20,0);
+    ctx.restore();
     if(basicStyle==='mono'){
       ctx.strokeStyle='#a2a29e';ctx.lineWidth=2;ctx.strokeRect(b.x-4,b.y-4,b.w+8,b.h+8);
     }
