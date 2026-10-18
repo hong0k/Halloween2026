@@ -34,3 +34,18 @@ header,main{position:relative}
 .basic-styles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 15px}.basic-styles button{border:1px solid var(--border);background:var(--panel);border-radius:8px;padding:14px 6px;font-size:12px;color:var(--text-main)}.basic-styles button.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.basic-styles small{display:block;font-size:9px;color:var(--text-muted);margin-top:6px}.style-swatch{display:block;width:26px;height:34px;margin:0 auto 10px;border:3px solid #fff;box-shadow:0 2px 6px #0004;background:linear-gradient(90deg,#777 46%,transparent 46%,transparent 54%,#777 54%)}.style-swatch.white{border-color:#fff;background-color:#fff}.style-swatch.black{border-color:#111;background-color:#111}.style-swatch.mono{border-color:#deddd9;background-color:#deddd9}#basic-style-note{margin:0 0 26px;font-size:11px}
 .frame-choices{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.frame-choices .frame{font-size:12px;padding:16px 6px}.frame-choices .frame small{font-size:9px;line-height:1.6}@media(max-width:380px){.frame-choices .frame{font-size:11px}.frame-choices .frame small{font-size:8px}}
 @font-face{font-family:'Hongok Hand';src:url('./assets/fonts/GamjaFlower-Korean.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}#cyworld-options{margin:0 0 24px}#cyworld-options .zoom-label{margin-top:0}#cyworld-options .description{margin:0;font-size:11px;line-height:1.8}
+:root[data-theme="cyworld"]{color-scheme:light;--accent:#93617a;--page-bg:#fffaf5;--panel:#fffdfb;--glow:#ead7e555;--text-main:#51484b;--text-muted:#7d6d75;--border:#d5c6cc}
+[data-theme="cyworld"] body{background-image:radial-gradient(ellipse at 85% 5%,var(--glow),transparent 55%),radial-gradient(#c5b7bd55 .7px,transparent .7px);background-size:auto,18px 18px}
+[data-theme="cyworld"] .intro h1,[data-theme="cyworld"] .hint{font-family:'Hongok Hand',sans-serif}
+[data-theme="cyworld"] .intro h1{font-size:54px;font-weight:400;letter-spacing:-1px}
+[data-theme="cyworld"] .intro::after{content:'♡';opacity:.12}
+[data-theme="cyworld"] .preview-panel{background:#f6eeeb;border-color:var(--border)}
+[data-theme="cyworld"] .mode.active,[data-theme="cyworld"] .frame.active{background:#f5e9ee}
+[data-theme="cyworld"] .primary,[data-theme="cyworld"] .download,[data-theme="cyworld"] .characters button.active,[data-theme="cyworld"] .custom-character[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fffaf8}
+[data-theme="cyworld"] .label,[data-theme="cyworld"] .description,[data-theme="cyworld"] .hint,[data-theme="cyworld"] .editor,[data-theme="cyworld"] .edit-options,[data-theme="cyworld"] .zoom-label,[data-theme="cyworld"] .format-label,[data-theme="cyworld"] .camera-options{color:var(--text-muted)}
+[data-theme="cyworld"] .editor,[data-theme="cyworld"] .theme-picker button{border-color:var(--border)}
+[data-theme="cyworld"] header,[data-theme="cyworld"] footer,[data-theme="cyworld"] .theme-picker,[data-theme="cyworld"] .download-area{border-color:#dfd2d8}
+[data-theme="cyworld"] #status,[data-theme="cyworld"] #camera-status,[data-theme="cyworld"] #camera-label{color:#805a70}
+[data-theme="cyworld"] input::placeholder{color:#94848d}
+[data-theme="cyworld"] .button:focus-visible,[data-theme="cyworld"] button:focus-visible{outline-color:var(--accent)}
+@media(max-width:760px){[data-theme="cyworld"] .intro h1{font-size:42px}}
