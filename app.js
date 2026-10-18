@@ -121,3 +121,13 @@ async function init(){
   select(0);draw();
 }
 init();
+
+function setTheme(theme){
+  if(!['lime','pumpkin','pink'].includes(theme))theme='lime';
+  document.documentElement.dataset.theme=theme;
+  document.querySelectorAll('.theme-picker button').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.theme===theme)));
+  document.querySelector('meta[name="theme-color"]').content={lime:'#1b1622',pumpkin:'#1d0d0a',pink:'#191919'}[theme];
+  try{localStorage.setItem('hongok-theme',theme);}catch{}
+}
+document.querySelectorAll('.theme-picker button').forEach(button=>button.onclick=()=>setTheme(button.dataset.theme));
+try{setTheme(localStorage.getItem('hongok-theme')||'lime');}catch{setTheme('lime');}
