@@ -18,7 +18,7 @@ function drawPhoto(photo,b) {
 }
 function draw() {
   ctx.fillStyle=frame==='halloween'?'#392342':'#f6eee3';ctx.fillRect(0,0,1200,1560);
-  ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';ctx.fillText(frame==='halloween'?'HALLOWEEN NIGHT':'홍옥필름',600,84);
+  ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';ctx.fillText(frame==='halloween'?'HALLOWEEN NIGHT':'HONGOK FILM',600,84);
   boxes.forEach((b,i) => {
     ctx.fillStyle=frame==='halloween'?'#e5d4c7':'#ddd6df';ctx.fillRect(b.x,b.y,b.w,b.h);
     if(photos[i]) drawPhoto(photos[i],b);
@@ -38,7 +38,7 @@ function draw() {
   const overlay=assets.get(config?.overlays[frame==='basic'?'together':frame]);if(overlay)ctx.drawImage(overlay,0,0,1200,1560);
   ctx.fillStyle=frame==='halloween'?'#f4d5b3':'#68576d';ctx.font='24px sans-serif';
   ctx.fillText($('caption').value.trim() || '네 장에 담는, 우리만의 이야기.',600,1470,1080);
-  ctx.font='16px sans-serif';ctx.fillText('홍옥필름  ·  '+new Date().toLocaleDateString('ko-KR'),600,1515);
+  ctx.font='16px sans-serif';ctx.fillText('HONGOK FILM  ·  '+new Date().toLocaleDateString('ko-KR'),600,1515);
   const count=photos.filter(Boolean).length;$('progress').textContent=`${count} / 4`;$('download').disabled=count!==4||busy;$('share').disabled=count!==4||busy;
 }
 function select(index) {selected=index;document.querySelectorAll('.slot').forEach((el,i)=>{el.classList.toggle('active',i===index);el.setAttribute('aria-pressed',String(i===index));});$('selected-label').textContent=`${index+1}번째 사진`;$('zoom').disabled=!photos[index];$('zoom').value=photos[index]?.zoom??1;$('zoom-value').textContent=Math.round(Number($('zoom').value)*100)+'%';$('mirror').checked=photos[index]?.mirror??false;$('mirror').disabled=!photos[index];$('remove').disabled=!photos[index];updateCameraLabel();}
