@@ -23,7 +23,7 @@ function draw() {
   const background=assets.get(backgroundPath);if(background){
     ctx.drawImage(background,0,0,1200,1560);
     const assetName=backgroundPath?.split('?')[0];
-    const adjusted=['assets/background-01.png','assets/background-02.png','assets/background-03.png'].includes(assetName);
+    const adjusted=['assets/background-01.png','assets/background-02.png'].includes(assetName);
     if(frame==='halloween'&&adjusted){
       // Map the entire decorative edge strip into each 60px gutter, with 4px inset.
       // Source art is wider than the gutter; scaling keeps complete objects visible.
@@ -144,7 +144,7 @@ window.addEventListener('pagehide',closeCamera);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&$('camera-dialog').open)$('camera-dialog').close();});
 async function init(){
   try{
-    const response=await fetch('./assets/frames.json?v=20261019.9');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261019.10');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;[...$('characters').children].forEach((b,j)=>{b.classList.toggle('active',j===i);b.setAttribute('aria-pressed',String(j===i));});draw();updateCameraLabel();};$('characters').append(button);});
