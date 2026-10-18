@@ -3,7 +3,7 @@ const canvas = $('result');
 const ctx = canvas.getContext('2d');
 const boxes = [ [60,160], [620,160], [60,800], [620,800] ].map(([x,y]) => ({x,y,w:520,h:610}));
 const photos = Array(4).fill(null);
-let selected = 0, mode = 'together', character = 0, config, stream, facing = 'user', busy = false, cameraVersion = 0, captureVersion = 0;
+let selected = 0, mode = 'together', frame = 'basic', character = 0, config, stream, facing = 'user', busy = false, cameraVersion = 0, captureVersion = 0;
 const assets = new Map();
 const status = (message) => { $('status').textContent = message; };
 function imageFrom(url) { return new Promise((resolve,reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error('이미지를 불러오지 못했어요.')); image.src = url; }); }
@@ -17,10 +17,10 @@ function drawPhoto(photo,b) {
   ctx.translate(b.x+b.w/2+photo.x,b.y+b.h/2+photo.y);ctx.scale(photo.mirror?-1:1,1);ctx.drawImage(photo.image,-iw/2,-ih/2,iw,ih);ctx.restore();
 }
 function draw() {
-  ctx.fillStyle=mode==='halloween'?'#392342':'#f6eee3';ctx.fillRect(0,0,1200,1560);
-  ctx.textAlign='center';ctx.fillStyle=mode==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';ctx.fillText(mode==='halloween'?'HALLOWEEN NIGHT':'홍옥필름',600,84);
+  ctx.fillStyle=frame==='halloween'?'#392342':'#f6eee3';ctx.fillRect(0,0,1200,1560);
+  ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';ctx.fillText(frame==='halloween'?'HALLOWEEN NIGHT':'홍옥필름',600,84);
   boxes.forEach((b,i) => {
-    ctx.fillStyle=mode==='halloween'?'#e5d4c7':'#ddd6df';ctx.fillRect(b.x,b.y,b.w,b.h);
+    ctx.fillStyle=frame==='halloween'?'#e5d4c7':'#ddd6df';ctx.fillRect(b.x,b.y,b.w,b.h);
     if(photos[i]) drawPhoto(photos[i],b);
     else {ctx.fillStyle='#84758b';ctx.font='26px sans-serif';ctx.fillText(`＋ ${i+1}번째 사진`,b.x+b.w/2,b.y+b.h/2);}
     if(mode==='together') {
@@ -32,10 +32,11 @@ function draw() {
         ctx.fillStyle='#745b8655';ctx.beginPath();ctx.arc(b.x+b.w*.81,b.y+215,68,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(b.x+b.w*.81,b.y+480,125,180,0,0,Math.PI*2);ctx.fill();
         ctx.fillStyle='#55415e';ctx.font='bold 24px sans-serif';ctx.fillText(config?.characters[character].name??'',b.x+b.w*.79,b.y+b.h-70);ctx.font='16px sans-serif';ctx.fillText('캐릭터 준비 중',b.x+b.w*.79,b.y+b.h-38);ctx.restore();
       }
-    } else {ctx.fillStyle='#633b6c';ctx.font='26px sans-serif';ctx.fillText(['✦','☾','☾','✦'][i],b.x+b.w-24,b.y+35);}
+    }
+    if(frame==='halloween') {ctx.fillStyle='#633b6c';ctx.font='26px sans-serif';ctx.fillText(['✦','☾','☾','✦'][i],b.x+b.w-24,b.y+35);}
   });
-  const overlay=assets.get(config?.overlays[mode]);if(overlay)ctx.drawImage(overlay,0,0,1200,1560);
-  ctx.fillStyle=mode==='halloween'?'#f4d5b3':'#68576d';ctx.font='24px sans-serif';
+  const overlay=assets.get(config?.overlays[frame==='basic'?'together':frame]);if(overlay)ctx.drawImage(overlay,0,0,1200,1560);
+  ctx.fillStyle=frame==='halloween'?'#f4d5b3':'#68576d';ctx.font='24px sans-serif';
   ctx.fillText($('caption').value.trim() || '네 장에 담는, 우리만의 이야기.',600,1470,1080);
   ctx.font='16px sans-serif';ctx.fillText('홍옥필름  ·  '+new Date().toLocaleDateString('ko-KR'),600,1515);
   const count=photos.filter(Boolean).length;$('progress').textContent=`${count} / 4`;$('download').disabled=count!==4||busy;$('share').disabled=count!==4||busy;
@@ -67,14 +68,15 @@ $('center').onclick=()=>{if(photos[selected])Object.assign(photos[selected],{x:0
 $('remove').onclick=()=>{photos[selected]=null;select(selected);draw();status('선택한 사진을 지웠어요.');};
 $('reset').onclick=()=>{if(photos.some(Boolean)&&!window.confirm('추가한 사진과 문구를 모두 지울까요?'))return;photos.fill(null);$('caption').value='';select(0);draw();status('새로운 추억을 시작해요.');};
 $('caption').oninput=draw;
-document.querySelectorAll('.mode').forEach(el=>el.onclick=()=>{mode=el.dataset.mode;document.querySelectorAll('.mode').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});$('character-section').hidden=mode!=='together';$('camera-guide').hidden=mode!=='together';draw();});
+document.querySelectorAll('.mode').forEach(el=>el.onclick=()=>{mode=el.dataset.mode;document.querySelectorAll('.mode').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});$('character-section').hidden=mode!=='together';$('camera-guide').hidden=mode!=='together';draw();updateCameraLabel();});
+document.querySelectorAll('.frame').forEach(el=>el.onclick=()=>{frame=el.dataset.frame;document.querySelectorAll('.frame').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});draw();updateCameraLabel();});
 function exportFormat(){const jpg=$('format').value==='jpg';return {extension:jpg?'jpg':'png',type:jpg?'image/jpeg':'image/png'};}
 const blob=(type)=>new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('이미지를 만들지 못했어요.')),type,0.95));
-$('download').onclick=async()=>{try{const format=exportFormat();const image=await blob(format.type);const url=URL.createObjectURL(image);const a=document.createElement('a');a.href=url;a.download=`plot-${mode}-${Date.now()}.${format.extension}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);status(`${format.extension.toUpperCase()} 이미지 저장을 요청했어요. 모바일에서 저장이 어렵다면 이미지 공유를 이용해주세요.`);}catch{status('이미지 저장에 실패했어요. 다시 시도해주세요.');}};
+$('download').onclick=async()=>{try{const format=exportFormat();const image=await blob(format.type);const url=URL.createObjectURL(image);const a=document.createElement('a');a.href=url;a.download=`plot-${frame}-${mode}-${Date.now()}.${format.extension}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);status(`${format.extension.toUpperCase()} 이미지 저장을 요청했어요. 모바일에서 저장이 어렵다면 이미지 공유를 이용해주세요.`);}catch{status('이미지 저장에 실패했어요. 다시 시도해주세요.');}};
 function updateShare(){const format=exportFormat();$('share').hidden=!(navigator.canShare&&navigator.canShare({files:[new File([''],`photo.${format.extension}`,{type:format.type})]}));}
 $('format').onchange=updateShare;updateShare();
 $('share').onclick=async()=>{try{const format=exportFormat();const image=await blob(format.type);await navigator.share({files:[new File([image],`plot-photo.${format.extension}`,{type:format.type})]});}catch(e){if(e.name!=='AbortError')status('공유에 실패했어요. 이미지 저장을 이용해주세요.');}};
-function updateCameraLabel(){$('camera-label').textContent=`${selected+1}번째 사진 촬영 · ${mode==='together'?(config?.characters[character].name??'')+'와 함께':'할로윈 테마'}`;}
+function updateCameraLabel(){$('camera-label').textContent=`${selected+1}번째 사진 촬영 · ${mode==='together'?(config?.characters[character].name??'')+'와 함께':'혼자 찍기'}`;}
 function stopStream(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('video').srcObject=null;}
 function closeCamera(){cameraVersion++;captureVersion++;stopStream();$('capture').disabled=true;$('countdown').textContent='';}
 async function startCamera(){

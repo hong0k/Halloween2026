@@ -2,14 +2,17 @@
 <html lang="ko">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#20182b"><title>홍옥필름 · 네컷 스튜디오</title><link rel="stylesheet" href="./style.css"></head>
 <body>
-<header><a class="brand" href="./">홍옥필름<span>HALLOWEEN EDITION</span></a><span class="edition" aria-label="배포 버전 v2026.10.18.1">v2026.10.18.1</span></header>
+<header><a class="brand" href="./">홍옥필름<span>HALLOWEEN EDITION</span></a><span class="edition" aria-label="배포 버전 v2026.10.18.2">v2026.10.18.2</span></header>
 <main>
 <section class="intro"><p class="eyebrow">A LITTLE MAGIC, FOUR MEMORIES</p><h1>우리의 네 컷,<br>조금 특별하게<span>✦</span></h1><p>좋아하는 캐릭터와 함께, 혹은 나만의 할로윈.<br>지금 이 순간을 네 장의 추억으로 남겨요.</p></section>
 <div class="studio">
 <section class="preview-panel" aria-label="네컷 미리보기"><div class="panel-top"><span>YOUR PHOTO STRIP</span><span id="progress">0 / 4</span></div><div class="paper"><canvas id="result" width="1200" height="1560" aria-label="완성될 네컷 사진 미리보기"></canvas><div id="slots" class="slots"></div></div><p class="hint">사진을 선택하고 드래그해서 위치를 맞춰주세요.</p><span class="sample-label">임시 프레임 · 캐릭터 이미지 준비 중</span></section>
 <section class="controls" aria-label="사진 편집">
 <div class="step"><span class="number">01</span><h2>어떤 추억을 남길까요?</h2></div>
-<div class="modes"><button class="mode active" data-mode="together" aria-pressed="true"><span>♡</span>같이 찍기<small>캐릭터와 나란히</small></button><button class="mode" data-mode="halloween" aria-pressed="false"><span>✧</span>할로윈 테마<small>우리만의 할로윈</small></button></div>
+<label class="label">프레임 선택</label>
+<div class="modes"><button class="frame active" data-frame="basic" aria-pressed="true"><span>▦</span>기본 프레임<small>깔끔하게 남기는 네 컷</small></button><button class="frame" data-frame="halloween" aria-pressed="false"><span>✧</span>할로윈 프레임<small>우리만의 할로윈</small></button></div>
+<label class="label">촬영 방식</label>
+<div class="modes"><button class="mode active" data-mode="together" aria-pressed="true"><span>♡</span>같이 찍기<small>캐릭터와 나란히</small></button><button class="mode" data-mode="solo" aria-pressed="false"><span>◎</span>혼자 찍기<small>나만의 네 컷</small></button></div>
 <div id="character-section"><label class="label">함께할 캐릭터</label><div id="characters" class="characters"></div></div>
 <div class="step"><span class="number">02</span><h2>네 순간을 채워주세요</h2></div>
 <p class="description">한 번에 여러 장을 올리거나, 카메라로 한 컷씩 찍어요.</p>
