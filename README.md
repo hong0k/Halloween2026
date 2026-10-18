@@ -37,7 +37,7 @@ python3 -m http.server 8000 --bind 0.0.0.0
 1. 저장소 기본 브랜치 `main`에 파일을 커밋·푸시합니다.
 2. GitHub 저장소 Settings → Pages → Build and deployment → Source를 **GitHub Actions**로 설정합니다.
 3. 포함된 `Deploy GitHub Pages` 워크플로가 정적 파일을 배포합니다. 이후 `main` 푸시마다 자동 배포됩니다.
-4. 기본 URL: `https://hong0k.github.io/Halloween2026/`
+4. 기본 URL: `https://hong0k.github.io/hongokfilm/`
 
 코드에 인증키가 필요하지 않습니다. 별도 빌드나 npm 의존성도 없습니다. 배포 계정 권한과 저장소 요금제에 따라 Pages 사용 가능 여부를 확인하세요.
 
