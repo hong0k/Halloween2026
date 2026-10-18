@@ -124,7 +124,7 @@ function draw() {
     if(frame==='halloween') {ctx.fillStyle='#633b6c';ctx.font='26px sans-serif';ctx.fillText(['✦','☾','☾','✦'][i],b.x+b.w-24,b.y+35);}
   });
   const overlay=assets.get(config?.overlays[frame==='basic'?'together':frame]);if(overlay)ctx.drawImage(overlay,0,0,1200,1560);
-  ctx.fillStyle=frame==='halloween'?(config?.footer_colors?.halloween?.[theme]??'#f4d5b3'):'#68576d';ctx.font='24px sans-serif';
+  ctx.fillStyle=frame==='halloween'?(getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim()||'#f4d5b3'):'#68576d';ctx.font='24px sans-serif';
   ctx.fillText($('caption').value.trim() || '네 장에 담는, 우리만의 이야기.',600,1470,1080);
   ctx.font='16px sans-serif';ctx.fillText('HONGOK FILM  ·  '+new Date().toLocaleDateString('ko-KR'),600,1515);
   const count=photos.filter(Boolean).length;$('progress').textContent=`${count} / 4`;$('download').disabled=count!==4||busy;$('share').disabled=count!==4||busy;
@@ -246,7 +246,7 @@ $('repeat-character').onclick=()=>{
 };
 async function init(){
   try{
-    const response=await fetch('./assets/frames.json?v=20261019.18');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261019.19');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
