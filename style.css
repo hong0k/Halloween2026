@@ -54,3 +54,16 @@ header,main{position:relative}
 .doodle-husband{position:absolute;left:54%;top:48%;font-size:42px;transform:rotate(-17deg)}
 .doodle-face{position:absolute;right:2%;bottom:0;font-size:52px;transform:rotate(-12deg)}
 @media(max-width:760px){[data-theme="cyworld"] .cyworld-doodles{position:relative;height:66px;margin-top:6px}.doodle-husband{left:53%;top:0;font-size:28px}.doodle-face{right:3%;bottom:0;font-size:32px}}
+:root[data-theme="simple"]{color-scheme:light;--accent:#171717;--page-bg:#fff;--panel:#fff;--glow:transparent;--text-main:#171717;--text-muted:#626262;--border:#d6d6d6}
+[data-theme="simple"] body{background:#fff}
+[data-theme="simple"] .intro::after{display:none}
+[data-theme="simple"] .preview-panel{background:#f5f5f5;border-color:#ddd}
+[data-theme="simple"] .mode.active,[data-theme="simple"] .frame.active{background:#f2f2f2}
+[data-theme="simple"] .primary,[data-theme="simple"] .download,[data-theme="simple"] .characters button.active,[data-theme="simple"] .custom-character[aria-pressed=true]{background:#171717;border-color:#171717;color:#fff}
+[data-theme="simple"] .label,[data-theme="simple"] .description,[data-theme="simple"] .hint,[data-theme="simple"] .editor,[data-theme="simple"] .edit-options,[data-theme="simple"] .zoom-label,[data-theme="simple"] .format-label,[data-theme="simple"] .camera-options{color:var(--text-muted)}
+[data-theme="simple"] .editor,[data-theme="simple"] .theme-picker button{border-color:var(--border)}
+[data-theme="simple"] header,[data-theme="simple"] footer,[data-theme="simple"] .theme-picker,[data-theme="simple"] .download-area{border-color:#ddd}
+[data-theme="simple"] #status,[data-theme="simple"] #camera-status,[data-theme="simple"] #camera-label{color:#444}
+[data-theme="simple"] input::placeholder{color:#777}
+[data-theme="simple"] .theme-picker button::before{background:#171717}
+[data-theme="simple"] input[type=range],[data-theme="simple"] input[type=checkbox]{accent-color:#171717}

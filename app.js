@@ -136,7 +136,7 @@ function drawMiniroomDetails(){
 function draw(forExport=false) {
   ctx.fillStyle=frame==='halloween'?'#392342':basicPalettes[basicStyle].paper;ctx.fillRect(0,0,1200,1560);
   const theme=document.documentElement.dataset.theme||'lime';
-  const halloweenTheme=theme==='cyworld'?'pink':theme;
+  const halloweenTheme=['cyworld','simple'].includes(theme)?'pink':theme;
   const backgroundPath=frame==='halloween'?config?.backgrounds?.halloween?.[halloweenTheme]:config?.backgrounds?.[frame];
   const background=assets.get(backgroundPath);if(background){
     ctx.drawImage(background,0,0,1200,1560);
@@ -194,7 +194,7 @@ function draw(forExport=false) {
   });
   ctx.restore();if(frame==='basic')drawBasicDetails();if(frame==='miniroom')drawMiniroomDetails();
   const overlay=assets.get(config?.overlays[frame==='basic'?'together':frame]);if(overlay)ctx.drawImage(overlay,0,0,1200,1560);
-  ctx.fillStyle=frame==='halloween'?(theme==='cyworld'?'#cdbcc3':getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim()||'#f4d5b3'):frame==='miniroom'?'#8d857b':basicPalettes[basicStyle].muted;ctx.font=frame==='miniroom'?'29px "Hongok Hand",sans-serif':'24px sans-serif';
+  ctx.fillStyle=frame==='halloween'?(['cyworld','simple'].includes(theme)?'#cdbcc3':getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim()||'#f4d5b3'):frame==='miniroom'?'#8d857b':basicPalettes[basicStyle].muted;ctx.font=frame==='miniroom'?'29px "Hongok Hand",sans-serif':'24px sans-serif';
   ctx.fillText($('caption').value.trim()||(forExport===true?'':'문구를 입력해주세요. (선택사항)'),600,1470,1080);
   ctx.font='16px sans-serif';ctx.fillText('HONGOK FILM  ·  '+new Date().toLocaleDateString('ko-KR'),600,1515);
   const count=activePhotos().filter(Boolean).length;$('progress').textContent=`${count} / ${boxes.length}`;$('download').disabled=count!==boxes.length||busy;$('share').disabled=count!==boxes.length||busy;
@@ -357,10 +357,10 @@ async function init(){
 init();
 
 function setTheme(theme){
-  if(!['lime','pumpkin','pink','cyworld'].includes(theme))theme='lime';
+  if(!['simple','lime','pumpkin','pink','cyworld'].includes(theme))theme='lime';
   document.documentElement.dataset.theme=theme;
   document.querySelectorAll('.theme-picker button').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.theme===theme)));
-  document.querySelector('meta[name="theme-color"]').content={lime:'#1b1622',pumpkin:'#1d0d0a',pink:'#191919',cyworld:'#fffaf5'}[theme];
+  document.querySelector('meta[name="theme-color"]').content={lime:'#1b1622',pumpkin:'#1d0d0a',pink:'#191919',cyworld:'#fffaf5',simple:'#ffffff'}[theme];
   try{localStorage.setItem('hongok-theme',theme);}catch{}
   draw();
 }
