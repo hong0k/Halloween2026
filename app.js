@@ -3,7 +3,7 @@ const canvas = $('result');
 const ctx = canvas.getContext('2d');
 const fourBoxes = [ [60,160], [620,160], [60,800], [620,800] ].map(([x,y]) => ({x,y,w:520,h:610}));
 let boxes=fourBoxes;
-const wideBoxes=[{x:60,y:290,w:1080,h:470},{x:60,y:840,w:1080,h:470}];
+const wideBoxes=[{x:100,y:290,w:1000,h:470},{x:100,y:840,w:1000,h:470}];
 const activePhotos=()=>photos.slice(0,boxes.length);
 const photos = Array(4).fill(null);
 const customPoses = Array(4).fill(null);
@@ -129,7 +129,7 @@ function drawMiniroomDetails(){
     ctx.strokeRect(b.x-1,b.y-1,b.w+2,b.h+2);
     ctx.textAlign='left';ctx.fillStyle='#a4969d';ctx.font='20px "Hongok Hand",sans-serif';ctx.fillText(String(i+1).padStart(2,'0')+'。',b.x,b.y+b.h+34);
     ctx.textAlign='center';ctx.fillStyle='#857780';ctx.font='29px "Hongok Hand",sans-serif';
-    ctx.fillText(i===0?'남푠 ♡ 마누라 바람피면 주거 ㅋㅋ':'우리의 이야기는 아직 진행 중。',600,b.y+b.h+40);
+    ctx.fillText(i===0?'남푠♡마누라 – 바람피면 주거 ㅋㅋ':'우리의 이야기는 아직 진행 중。',600,b.y+b.h+40);
   });
   ctx.textAlign='center';ctx.fillStyle='#b2a3ad';ctx.font='24px "Hongok Hand",sans-serif';ctx.fillText('┌  오늘의 우리를, 오래오래 기억할게  ┘',600,1413);
 }
