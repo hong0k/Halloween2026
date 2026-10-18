@@ -18,7 +18,18 @@ function drawPhoto(photo,b) {
 }
 function draw() {
   ctx.fillStyle=frame==='halloween'?'#392342':'#f6eee3';ctx.fillRect(0,0,1200,1560);
-  const background=assets.get(config?.backgrounds?.[frame]);if(background)ctx.drawImage(background,0,0,1200,1560);
+  const background=assets.get(config?.backgrounds?.[frame]);if(background){
+    ctx.drawImage(background,0,0,1200,1560);
+    if(frame==='halloween'&&config?.backgrounds?.halloween==='assets/halloween-background-v2.png'){
+      // Place the ghost sprites inside the 60px side gutters at the row gap.
+      // Restore their generated positions using a neighboring blank strip first.
+      for(const x of [10,1015]){
+        ctx.drawImage(background,x,850,75,1,x/1100*1200,760/1430*1560,75/1100*1200,70/1430*1560);
+      }
+      ctx.drawImage(background,10,760,75,70,5,765,48,45);
+      ctx.drawImage(background,1015,760,75,70,1147,765,48,45);
+    }
+  }
   ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';if(frame!=='halloween')ctx.fillText('HONGOK FILM',600,84);
   boxes.forEach((b,i) => {
     ctx.fillStyle=frame==='halloween'?'#e5d4c7':'#ddd6df';ctx.fillRect(b.x,b.y,b.w,b.h);
