@@ -56,6 +56,10 @@
     "halloween": null
   },
   "backgrounds": {
-    "halloween": "assets/halloween-background-v2.png"
+    "halloween": {
+      "lime": null,
+      "pumpkin": "assets/background-02.png",
+      "pink": null
+    }
   }
 }
