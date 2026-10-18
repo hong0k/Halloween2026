@@ -57,7 +57,7 @@
   },
   "backgrounds": {
     "halloween": {
-      "lime": null,
+      "lime": "assets/background-01.png",
       "pumpkin": "assets/background-02.png",
       "pink": null
     }

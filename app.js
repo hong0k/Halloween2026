@@ -22,14 +22,18 @@ function draw() {
   const backgroundPath=frame==='halloween'?config?.backgrounds?.halloween?.[theme]:config?.backgrounds?.[frame];
   const background=assets.get(backgroundPath);if(background){
     ctx.drawImage(background,0,0,1200,1560);
-    if(frame==='halloween'&&backgroundPath==='assets/background-02.png'){
-      // Place the ghost sprites inside the 60px side gutters at the row gap.
-      // Restore their generated positions using a neighboring blank strip first.
+    const ghostLayout={
+      'assets/background-01.png':{y:665,h:85,blank:750},
+      'assets/background-02.png':{y:760,h:70,blank:850}
+    }[backgroundPath];
+    if(frame==='halloween'&&ghostLayout){
+      // Keep each sprite fully inside the 60px gutter, at the photo row gap.
+      const {y,h,blank}=ghostLayout;
       for(const x of [10,1015]){
-        ctx.drawImage(background,x,850,75,1,x/1100*1200,760/1430*1560,75/1100*1200,70/1430*1560);
+        ctx.drawImage(background,x,blank,75,1,x/1100*1200,y/1430*1560,75/1100*1200,h/1430*1560);
       }
-      ctx.drawImage(background,10,760,75,70,5,765,48,45);
-      ctx.drawImage(background,1015,760,75,70,1147,765,48,45);
+      ctx.drawImage(background,10,y,75,h,5,765,48,45);
+      ctx.drawImage(background,1015,y,75,h,1147,765,48,45);
     }
   }
   ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';if(frame!=='halloween')ctx.fillText('HONGOK FILM',600,84);
