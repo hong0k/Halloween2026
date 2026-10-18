@@ -76,7 +76,7 @@ const basicPalettes={
 function drawBasicHeader(){
   const p=basicPalettes[basicStyle];ctx.fillStyle=p.ink;
   ctx.textAlign='center';ctx.font=basicStyle==='white'?'bold 48px Georgia,serif':basicStyle==='black'?'bold 43px sans-serif':'italic 46px Georgia,serif';
-  ctx.save();ctx.textBaseline='middle';ctx.fillText('HONGOK FILM',600,60);ctx.restore();
+  ctx.save();ctx.textBaseline='alphabetic';const titleTop=ctx.measureText('HONGOK FILM').actualBoundingBoxAscent;ctx.fillText('HONGOK FILM',600,60+titleTop);ctx.restore();
   ctx.strokeStyle=basicStyle==='black'?'#555555':'#aeaeaa';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(60,133);ctx.lineTo(1140,133);ctx.stroke();
 }
