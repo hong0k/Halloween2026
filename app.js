@@ -25,7 +25,7 @@ function draw() {
     const ghostLayout={
       'assets/background-01.png':{y:665,h:85,blank:750},
       'assets/background-02.png':{y:760,h:70,blank:850}
-    }[backgroundPath];
+    }[backgroundPath?.split('?')[0]];
     if(frame==='halloween'&&ghostLayout){
       // Keep each sprite fully inside the 60px gutter, at the photo row gap.
       const {y,h,blank}=ghostLayout;
@@ -131,7 +131,7 @@ window.addEventListener('pagehide',closeCamera);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&$('camera-dialog').open)$('camera-dialog').close();});
 async function init(){
   try{
-    const response=await fetch('./assets/frames.json');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261019.6');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;[...$('characters').children].forEach((b,j)=>{b.classList.toggle('active',j===i);b.setAttribute('aria-pressed',String(j===i));});draw();updateCameraLabel();};$('characters').append(button);});
