@@ -68,10 +68,12 @@ $('remove').onclick=()=>{photos[selected]=null;select(selected);draw();status('�
 $('reset').onclick=()=>{if(photos.some(Boolean)&&!window.confirm('추가한 사진과 문구를 모두 지울까요?'))return;photos.fill(null);$('caption').value='';select(0);draw();status('새로운 추억을 시작해요.');};
 $('caption').oninput=draw;
 document.querySelectorAll('.mode').forEach(el=>el.onclick=()=>{mode=el.dataset.mode;document.querySelectorAll('.mode').forEach(b=>{b.classList.toggle('active',b===el);b.setAttribute('aria-pressed',String(b===el));});$('character-section').hidden=mode!=='together';$('camera-guide').hidden=mode!=='together';draw();});
-const blob=()=>new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('이미지를 만들지 못했어요.')),'image/png'));
-$('download').onclick=async()=>{try{const image=await blob();const url=URL.createObjectURL(image);const a=document.createElement('a');a.href=url;a.download=`plot-${mode}-${Date.now()}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);status('PNG 이미지를 저장했어요. 모바일에서 저장이 어렵다면 이미지 공유를 이용해주세요.');}catch{status('이미지 저장에 실패했어요. 다시 시도해주세요.');}};
-if(navigator.canShare&&navigator.canShare({files:[new File([''],'photo.png',{type:'image/png'})]}))$('share').hidden=false;
-$('share').onclick=async()=>{try{const image=await blob();await navigator.share({files:[new File([image],'plot-photo.png',{type:'image/png'})]});}catch(e){if(e.name!=='AbortError')status('공유에 실패했어요. PNG 저장을 이용해주세요.');}};
+function exportFormat(){const jpg=$('format').value==='jpg';return {extension:jpg?'jpg':'png',type:jpg?'image/jpeg':'image/png'};}
+const blob=(type)=>new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('이미지를 만들지 못했어요.')),type,0.95));
+$('download').onclick=async()=>{try{const format=exportFormat();const image=await blob(format.type);const url=URL.createObjectURL(image);const a=document.createElement('a');a.href=url;a.download=`plot-${mode}-${Date.now()}.${format.extension}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);status(`${format.extension.toUpperCase()} 이미지 저장을 요청했어요. 모바일에서 저장이 어렵다면 이미지 공유를 이용해주세요.`);}catch{status('이미지 저장에 실패했어요. 다시 시도해주세요.');}};
+function updateShare(){const format=exportFormat();$('share').hidden=!(navigator.canShare&&navigator.canShare({files:[new File([''],`photo.${format.extension}`,{type:format.type})]}));}
+$('format').onchange=updateShare;updateShare();
+$('share').onclick=async()=>{try{const format=exportFormat();const image=await blob(format.type);await navigator.share({files:[new File([image],`plot-photo.${format.extension}`,{type:format.type})]});}catch(e){if(e.name!=='AbortError')status('공유에 실패했어요. 이미지 저장을 이용해주세요.');}};
 function updateCameraLabel(){$('camera-label').textContent=`${selected+1}번째 사진 촬영 · ${mode==='together'?(config?.characters[character].name??'')+'와 함께':'할로윈 테마'}`;}
 function stopStream(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('video').srcObject=null;}
 function closeCamera(){cameraVersion++;captureVersion++;stopStream();$('capture').disabled=true;$('countdown').textContent='';}
