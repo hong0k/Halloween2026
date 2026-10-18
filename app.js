@@ -87,8 +87,8 @@ function drawBasicDetails(){
     const left=i%2===0;
     ctx.save();ctx.translate(left?30:1170,b.y+b.h/2);ctx.rotate(left?-Math.PI/2:Math.PI/2);
     ctx.textBaseline='middle';
-    ctx.textAlign='left';ctx.fillText('► '+String(i+1).padStart(2,'0'),-b.h/2+20,0);
-    ctx.textAlign='right';ctx.fillText(basicStyle==='mono'?'MONO / MEMORY':'HONGOK / '+String(i+1).padStart(2,'0'),b.h/2-20,0);
+    ctx.textAlign='left';ctx.fillText('REC ● / '+String(i+1).padStart(2,'0'),-b.h/2+20,0);
+    ctx.textAlign='right';ctx.fillText((basicStyle==='mono'?'B&W 35mm':'35mm')+' / FRAME '+String(i+1).padStart(2,'0'),b.h/2-20,0);
     ctx.restore();
     if(basicStyle==='mono'){
       ctx.strokeStyle='#a2a29e';ctx.lineWidth=2;ctx.strokeRect(b.x-4,b.y-4,b.w+8,b.h+8);
@@ -155,7 +155,7 @@ function draw() {
   ctx.restore();if(frame==='basic')drawBasicDetails();
   const overlay=assets.get(config?.overlays[frame==='basic'?'together':frame]);if(overlay)ctx.drawImage(overlay,0,0,1200,1560);
   ctx.fillStyle=frame==='halloween'?(getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim()||'#f4d5b3'):basicPalettes[basicStyle].muted;ctx.font='24px sans-serif';
-  ctx.fillText($('caption').value.trim() || '네 장에 담는, 우리만의 이야기.',600,1470,1080);
+  ctx.fillText($('caption').value.trim(),600,1470,1080);
   ctx.font='16px sans-serif';ctx.fillText('HONGOK FILM  ·  '+new Date().toLocaleDateString('ko-KR'),600,1515);
   const count=photos.filter(Boolean).length;$('progress').textContent=`${count} / 4`;$('download').disabled=count!==4||busy;$('share').disabled=count!==4||busy;
   renderCameraCharacter();
