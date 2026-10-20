@@ -38,6 +38,12 @@ function registeredPose(index){
   return assets.get(path);
 }
 function drawRegisteredPose(image,b,c=ctx){
+  if(frame==='basic'&&config?.characters[character]?.id==='min'){
+    const scale=Math.min(b.h*.90/image.naturalHeight,b.w*.78/image.naturalWidth);
+    const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
+    c.save();c.beginPath();c.rect(b.x,b.y,b.w,b.h);c.clip();
+    c.drawImage(image,b.x+b.w*.74-w/2,b.y+b.h-h,w,h);c.restore();return;
+  }
   const width=b.w/2,scale=Math.max(width/image.naturalWidth,b.h/image.naturalHeight);
   const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
   c.save();c.beginPath();c.rect(b.x+width,b.y,width,b.h);c.clip();
