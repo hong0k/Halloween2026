@@ -38,6 +38,12 @@ function registeredPose(index){
   return assets.get(path);
 }
 function drawRegisteredPose(image,b,c=ctx,index=selected){
+  if(frame==='miniroom'&&config?.characters[character]?.id==='min'&&index===1){
+    const scale=Math.max(b.w*.5/image.naturalWidth,b.h/image.naturalHeight);
+    const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
+    c.save();c.beginPath();c.rect(b.x,b.y,b.w*.5,b.h);c.clip();
+    c.drawImage(image,b.x,b.y+14,w,h);c.restore();return;
+  }
   if(['basic','miniroom'].includes(frame)&&config?.characters[character]?.id==='min'){
     const left=frame==='miniroom'?index===1:index===3;
     const scale=Math.min(b.h*(left?.86:.90)/image.naturalHeight,b.w*.78/image.naturalWidth);
