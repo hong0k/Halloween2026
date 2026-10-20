@@ -8,7 +8,15 @@
         null,
         null,
         null
-      ]
+      ],
+      "pose_sets": {
+        "halloween": [
+          "assets/characters/kim/halloween/01.jpg",
+          "assets/characters/kim/halloween/02.jpg",
+          "assets/characters/kim/halloween/03.jpg",
+          "assets/characters/kim/halloween/04.jpg"
+        ]
+      }
     },
     {
       "id": "min",
