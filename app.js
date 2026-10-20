@@ -12,13 +12,17 @@ const assets = new Map();
 const status = (message) => { $('status').textContent = message; };
 function imageFrom(url) { return new Promise((resolve,reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error('이미지를 불러오지 못했어요.')); image.src = url; }); }
 function cover(image,w,h) { return Math.max(w/image.naturalWidth,h/image.naturalHeight); }
-function drawPhoto(photo,b) {
-  const s = cover(photo.image,b.w,b.h)*photo.zoom;
-  const iw=photo.image.naturalWidth*s, ih=photo.image.naturalHeight*s;
-  photo.x=Math.max(-(iw-b.w)/2,Math.min((iw-b.w)/2,photo.x));
-  photo.y=Math.max(-(ih-b.h)/2,Math.min((ih-b.h)/2,photo.y));
+function drawPhoto(photo,b,index) {
+  const paired=frame==='miniroom'&&mode==='together';
+  const right=paired&&config?.characters[character]?.id==='min'&&index===1;
+  const area=paired?{x:b.x+(right?b.w/2:0),y:b.y,w:b.w/2,h:b.h}:b;
+  const s=cover(photo.image,area.w,area.h)*photo.zoom;
+  const iw=photo.image.naturalWidth*s,ih=photo.image.naturalHeight*s;
+  const limitX=Math.abs(iw-area.w)/2,limitY=Math.abs(ih-area.h)/2;
+  photo.x=Math.max(-limitX,Math.min(limitX,photo.x));
+  photo.y=Math.max(-limitY,Math.min(limitY,photo.y));
   ctx.save();ctx.beginPath();ctx.rect(b.x,b.y,b.w,b.h);ctx.clip();
-  ctx.translate(b.x+b.w/2+photo.x,b.y+b.h/2+photo.y);ctx.scale(photo.mirror?-1:1,1);ctx.drawImage(photo.image,-iw/2,-ih/2,iw,ih);ctx.restore();
+  ctx.translate(area.x+area.w/2+photo.x,area.y+area.h/2+photo.y);ctx.scale(photo.mirror?-1:1,1);ctx.drawImage(photo.image,-iw/2,-ih/2,iw,ih);ctx.restore();
 }
 function editable(){return $('edit-layer').value==='character'&&character==='custom'&&mode==='together'?customPoses[selected]:photos[selected];}
 function drawCustomPose(pose,b,c=ctx){
@@ -205,7 +209,7 @@ function draw(forExport=false) {
   ctx.save();if(frame==='basic'&&basicStyle==='mono')ctx.filter='grayscale(1)';else if(frame==='miniroom')ctx.filter=cyworldFilter();
   boxes.forEach((b,i) => {
     ctx.fillStyle=frame==='halloween'?'#e5d4c7':frame==='miniroom'?'#e9e6df':basicPalettes[basicStyle].slot;ctx.fillRect(b.x,b.y,b.w,b.h);
-    if(photos[i]) drawPhoto(photos[i],b);
+    if(photos[i]) drawPhoto(photos[i],b,i);
     else {ctx.fillStyle='#84758b';ctx.font='26px sans-serif';ctx.fillText(`＋ ${i+1}번째 사진`,b.x+b.w/2,b.y+b.h/2);}
     if(mode==='together') {
       ctx.save();
@@ -241,7 +245,7 @@ function select(index) {
   const item=editable(), isCharacter=$('edit-layer').value==='character';
   $('selected-label').textContent=`${index+1}번째 ${isCharacter?'캐릭터':'사진'}`;
   $('remove').textContent=isCharacter?'이 캐릭터 지우기':'이 사진 지우기';
-  $('zoom').min=isCharacter?'0.3':'1';$('zoom').disabled=!item;$('zoom').value=item?.zoom??1;
+  $('zoom').min=isCharacter||frame==='miniroom'?'0.3':'1';$('zoom').disabled=!item;$('zoom').value=item?.zoom??1;
   $('zoom-value').textContent=Math.round(Number($('zoom').value)*100)+'%';
   $('mirror').checked=item?.mirror??false;$('mirror').disabled=!item;$('remove').disabled=!item;updateCameraLabel();
 }
@@ -393,7 +397,7 @@ $('repeat-character').onclick=()=>{
 async function init(){
   try{await document.fonts.load('29px "Hongok Hand"');}catch{}
   try{
-    const response=await fetch('./assets/frames.json?v=20261021.10');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261021.11');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>[...c.poses,...Object.values(c.pose_sets??{}).flat()]),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
