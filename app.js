@@ -16,7 +16,7 @@ function drawPhoto(photo,b,index) {
   const area=b;
   const s=cover(photo.image,area.w,area.h)*photo.zoom;
   const iw=photo.image.naturalWidth*s,ih=photo.image.naturalHeight*s;
-  const limitX=Math.abs(iw-area.w)/2,limitY=Math.abs(ih-area.h)/2;
+  const limitX=(iw+area.w)/2-24,limitY=(ih+area.h)/2-24;
   photo.x=Math.max(-limitX,Math.min(limitX,photo.x));
   photo.y=Math.max(-limitY,Math.min(limitY,photo.y));
   ctx.save();ctx.beginPath();ctx.rect(b.x,b.y,b.w,b.h);ctx.clip();
@@ -243,7 +243,7 @@ function select(index) {
   const item=editable(), isCharacter=$('edit-layer').value==='character';
   $('selected-label').textContent=`${index+1}번째 ${isCharacter?'캐릭터':'사진'}`;
   $('remove').textContent=isCharacter?'이 캐릭터 지우기':'이 사진 지우기';
-  $('zoom').min=isCharacter||frame==='miniroom'?'0.3':'1';$('zoom').disabled=!item;$('zoom').value=item?.zoom??1;
+  $('zoom').min='0.3';$('zoom').disabled=!item;$('zoom').value=item?.zoom??1;
   $('zoom-value').textContent=Math.round(Number($('zoom').value)*100)+'%';
   $('mirror').checked=item?.mirror??false;$('mirror').disabled=!item;$('remove').disabled=!item;updateCameraLabel();
 }
@@ -252,10 +252,29 @@ function buildSlots(){
 $('slots').replaceChildren();
 boxes.forEach((b,i)=>{
   const el=document.createElement('button');el.className='slot';el.style.cssText=`left:${b.x/12}%;top:${b.y/15.6}%;width:${b.w/12}%;height:${b.h/15.6}%`;el.setAttribute('aria-label',`${i+1}번째 사진 불러오기 또는 선택 및 위치 조정`);el.textContent=`${i+1}번째 사진`;el.onclick=()=>{select(i);if(!photos[i]&&!busy){$('edit-layer').value='photo';select(i);$('upload').click();}};$('slots').append(el);
-  let drag;
-  el.onpointerdown=(e)=>{select(i);if(!editable())return;el.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY,px:editable().x,py:editable().y};};
-  el.onpointermove=(e)=>{if(!drag||drag.id!==e.pointerId||!editable())return;const scale=1200/canvas.getBoundingClientRect().width;editable().x=drag.px+(e.clientX-drag.x)*scale;editable().y=drag.py+(e.clientY-drag.y)*scale;draw();};
-  el.onpointerup=el.onpointercancel=()=>{drag=null;};
+  const pointers=new Map();let gesture;
+  const baseline=()=>{
+    const item=editable(),points=[...pointers.values()];
+    if(!item||!points.length){gesture=null;return;}
+    const a=points[0],b=points[1]??a;
+    gesture={item,x:(a.x+b.x)/2,y:(a.y+b.y)/2,distance:Math.hypot(a.x-b.x,a.y-b.y),px:item.x,py:item.y,zoom:item.zoom};
+  };
+  el.onpointerdown=(e)=>{select(i);if(!editable())return;e.preventDefault();el.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});baseline();};
+  el.onpointermove=(e)=>{
+    if(!pointers.has(e.pointerId)||!gesture||editable()!==gesture.item)return;
+    e.preventDefault();pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    const points=[...pointers.values()],a=points[0],b=points[1]??a;
+    const scale=1200/canvas.getBoundingClientRect().width,item=gesture.item;
+    item.x=gesture.px+((a.x+b.x)/2-gesture.x)*scale;
+    item.y=gesture.py+((a.y+b.y)/2-gesture.y)*scale;
+    if(points.length>1&&gesture.distance>0){
+      item.zoom=Math.max(.3,Math.min(3,gesture.zoom*Math.hypot(a.x-b.x,a.y-b.y)/gesture.distance));
+      $('zoom').value=item.zoom;$('zoom-value').textContent=Math.round(item.zoom*100)+'%';
+    }
+    draw();
+  };
+  const release=(e)=>{pointers.delete(e.pointerId);baseline();};
+  el.onpointerup=el.onpointercancel=el.onlostpointercapture=release;
   el.onkeydown=(e)=>{if(!editable()||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();editable().x+=e.key==='ArrowLeft'?-15:e.key==='ArrowRight'?15:0;editable().y+=e.key==='ArrowUp'?-15:e.key==='ArrowDown'?15:0;draw();};
 });
 }
@@ -395,7 +414,7 @@ $('repeat-character').onclick=()=>{
 async function init(){
   try{await document.fonts.load('29px "Hongok Hand"');}catch{}
   try{
-    const response=await fetch('./assets/frames.json?v=20261021.12');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261021.13');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>[...c.poses,...Object.values(c.pose_sets??{}).flat()]),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
