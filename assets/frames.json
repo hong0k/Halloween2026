@@ -30,7 +30,9 @@
       "pose_sets": {
         "basic": [
           "assets/characters/min/basic/01.png",
-          "assets/characters/min/basic/02.png"
+          "assets/characters/min/basic/02.png",
+          "assets/characters/min/basic/03.png",
+          "assets/characters/min/basic/04.png"
         ],
         "halloween": [
           "assets/characters/min/halloween/01.jpg",
@@ -48,7 +50,15 @@
         null,
         null,
         null
-      ]
+      ],
+      "pose_sets": {
+        "halloween": [
+          "assets/characters/ok/halloween/01.jpg",
+          "assets/characters/ok/halloween/02.jpg",
+          "assets/characters/ok/halloween/03.jpg",
+          "assets/characters/ok/halloween/04.jpg"
+        ]
+      }
     },
     {
       "id": "yoon",
