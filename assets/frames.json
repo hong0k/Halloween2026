@@ -32,13 +32,17 @@
           "assets/characters/min/basic/01.png",
           "assets/characters/min/basic/02.png",
           "assets/characters/min/basic/03.png",
-          "assets/characters/min/basic/04.png"
+          "assets/characters/min/basic/04-repaired.png"
         ],
         "halloween": [
           "assets/characters/min/halloween/01.jpg",
           "assets/characters/min/halloween/02.jpg",
           "assets/characters/min/halloween/03.jpg",
           "assets/characters/min/halloween/04.jpg"
+        ],
+        "miniroom": [
+          "assets/characters/min/basic/01.png",
+          "assets/characters/min/basic/04-repaired.png"
         ]
       }
     },
