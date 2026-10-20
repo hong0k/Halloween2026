@@ -13,9 +13,7 @@ const status = (message) => { $('status').textContent = message; };
 function imageFrom(url) { return new Promise((resolve,reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error('이미지를 불러오지 못했어요.')); image.src = url; }); }
 function cover(image,w,h) { return Math.max(w/image.naturalWidth,h/image.naturalHeight); }
 function drawPhoto(photo,b,index) {
-  const paired=frame==='miniroom'&&mode==='together';
-  const right=paired&&config?.characters[character]?.id==='min'&&index===1;
-  const area=paired?{x:b.x+(right?b.w/2:0),y:b.y,w:b.w/2,h:b.h}:b;
+  const area=b;
   const s=cover(photo.image,area.w,area.h)*photo.zoom;
   const iw=photo.image.naturalWidth*s,ih=photo.image.naturalHeight*s;
   const limitX=Math.abs(iw-area.w)/2,limitY=Math.abs(ih-area.h)/2;
@@ -253,7 +251,7 @@ function select(index) {
 function buildSlots(){
 $('slots').replaceChildren();
 boxes.forEach((b,i)=>{
-  const el=document.createElement('button');el.className='slot';el.style.cssText=`left:${b.x/12}%;top:${b.y/15.6}%;width:${b.w/12}%;height:${b.h/15.6}%`;el.setAttribute('aria-label',`${i+1}번째 사진 선택 및 위치 조정`);el.textContent=`${i+1}번째 사진`;el.onclick=()=>select(i);$('slots').append(el);
+  const el=document.createElement('button');el.className='slot';el.style.cssText=`left:${b.x/12}%;top:${b.y/15.6}%;width:${b.w/12}%;height:${b.h/15.6}%`;el.setAttribute('aria-label',`${i+1}번째 사진 불러오기 또는 선택 및 위치 조정`);el.textContent=`${i+1}번째 사진`;el.onclick=()=>{select(i);if(!photos[i]&&!busy){$('edit-layer').value='photo';select(i);$('upload').click();}};$('slots').append(el);
   let drag;
   el.onpointerdown=(e)=>{select(i);if(!editable())return;el.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY,px:editable().x,py:editable().y};};
   el.onpointermove=(e)=>{if(!drag||drag.id!==e.pointerId||!editable())return;const scale=1200/canvas.getBoundingClientRect().width;editable().x=drag.px+(e.clientX-drag.x)*scale;editable().y=drag.py+(e.clientY-drag.y)*scale;draw();};
@@ -397,7 +395,7 @@ $('repeat-character').onclick=()=>{
 async function init(){
   try{await document.fonts.load('29px "Hongok Hand"');}catch{}
   try{
-    const response=await fetch('./assets/frames.json?v=20261021.11');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261021.12');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>[...c.poses,...Object.values(c.pose_sets??{}).flat()]),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
