@@ -63,13 +63,13 @@ function updateCharacterUI(){
 // Keep original artwork untouched. Isolate the existing bright corner ornaments
 // from the earlier decorated source once, excluding its regenerated title/background.
 let pinkOrnaments;
-function drawPinkDecorations(){
+function drawPinkDecorations(c=ctx){
   const source=assets.get(config?.decoration_sources?.pink);
   if(source&&!pinkOrnaments){
     pinkOrnaments=document.createElement('canvas');
     pinkOrnaments.width=source.naturalWidth;pinkOrnaments.height=source.naturalHeight;
-    const c=pinkOrnaments.getContext('2d');c.drawImage(source,0,0);
-    const pixels=c.getImageData(0,0,pinkOrnaments.width,pinkOrnaments.height);
+    const mask=pinkOrnaments.getContext('2d');mask.drawImage(source,0,0);
+    const pixels=mask.getImageData(0,0,pinkOrnaments.width,pinkOrnaments.height);
     for(let y=0;y<pinkOrnaments.height;y++)for(let x=0;x<pinkOrnaments.width;x++){
       const i=(y*pinkOrnaments.width+x)*4;
       const nx=x/pinkOrnaments.width,ny=y/pinkOrnaments.height;
@@ -77,21 +77,21 @@ function drawPinkDecorations(){
       const bright=pixels.data[i]>195&&pixels.data[i+1]>70&&pixels.data[i+2]>125;
       if(!corner||!bright)pixels.data[i+3]=0;
     }
-    c.putImageData(pixels,0,0);
+    mask.putImageData(pixels,0,0);
   }
   // Muted wallpaper is a separate layer, below photos and outside the title band.
-  ctx.save();ctx.beginPath();ctx.rect(0,160,1200,1250);ctx.clip();
-  ctx.fillStyle='#b76b91';ctx.globalAlpha=0.14;
+  c.save();c.beginPath();c.rect(0,160,1200,1250);c.clip();
+  c.fillStyle='#b76b91';c.globalAlpha=0.14;
   const bat=new Path2D('M-100 12 Q-85-35-110-55 Q-48-54-15-8 L-7-26 0-16 7-26 15-8 Q48-54 110-55 Q85-35 100 12 Q65-4 47 25 Q20 9 0 50 Q-20 9-47 25 Q-65-4-100 12Z');
   for(const [x,y,scale,angle] of [[80,285,1.5,-.3],[1090,430,1.5,.25],[535,720,1.4,-.2],[55,1010,1.4,.1],[1110,1180,1.5,-.2]]){
-    ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);ctx.fill(bat);ctx.restore();
+    c.save();c.translate(x,y);c.rotate(angle);c.scale(scale,scale);c.fill(bat);c.restore();
   }
   const cross=new Path2D('M-12-90 L0-106 12-90 12-28 48-28 64-12 48 4 12 4 12 100 0 117-12 100-12 4-48 4-64-12-48-28-12-28Z');
   for(const [x,y,angle] of [[470,360,0],[1070,740,.25],[710,1040,.2],[190,1260,-.2]]){
-    ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fill(cross);ctx.restore();
+    c.save();c.translate(x,y);c.rotate(angle);c.fill(cross);c.restore();
   }
-  ctx.restore();
-  if(pinkOrnaments)ctx.drawImage(pinkOrnaments,0,0,1200,1560);
+  c.restore();
+  if(pinkOrnaments)c.drawImage(pinkOrnaments,0,0,1200,1560);
 }
 const basicPalettes={
   white:{paper:'#ffffff',ink:'#1b1b1b',muted:'#666666',slot:'#efefef'},
@@ -388,7 +388,7 @@ async function init(){
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
   }catch{status('캐릭터 설정을 불러오지 못했어요. 페이지를 새로고침해주세요.');}
-  select(0);draw();
+  select(0);draw();initGallery();
 }
 init();
 
@@ -403,3 +403,71 @@ function setTheme(theme){
 }
 document.querySelectorAll('.theme-picker button').forEach(button=>button.onclick=()=>setTheme(button.dataset.theme));
 setTheme('simple');
+
+// Character-only collection has independent selection and canvas; editor state is untouched.
+let galleryCharacter='min';
+function galleryEntry(){return config?.characters.find(c=>c.id===galleryCharacter);}
+function galleryPaths(){return (galleryEntry()?.pose_sets?.halloween??[]).filter(Boolean);}
+function initGallery(){
+  if(!config){$('gallery-empty').hidden=false;$('gallery-content').hidden=true;return;}
+  $('gallery-characters').replaceChildren();
+  config.characters.forEach(entry=>{
+    const button=document.createElement('button');button.textContent=entry.name;button.dataset.character=entry.id;
+    button.onclick=()=>{galleryCharacter=entry.id;updateGallery();};$('gallery-characters').append(button);
+  });
+  updateGallery();
+}
+function updateGallery(){
+  const entry=galleryEntry(),paths=galleryPaths();
+  [...$('gallery-characters').children].forEach(b=>{const active=b.dataset.character===galleryCharacter;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
+  $('gallery-empty').hidden=paths.length>0;$('gallery-content').hidden=!paths.length;
+  $('gallery-title').textContent=(entry?.name??'')+' · 할로윈 원본 사진';
+  $('gallery-images').replaceChildren();$('gallery-status').textContent='';
+  paths.forEach((path,i)=>{
+    const card=document.createElement('article');card.className='gallery-card';
+    const img=document.createElement('img');img.src=path;img.alt=`${entry.name} 할로윈 포즈 ${i+1}`;img.loading='lazy';
+    const link=document.createElement('a');link.href=path;link.download=`${entry.id}-halloween-${String(i+1).padStart(2,'0')}.${path.split('?')[0].split('.').pop()}`;link.textContent=`${String(i+1).padStart(2,'0')} · 원본 저장 ↓`;
+    card.append(img,link);$('gallery-images').append(card);
+  });
+  renderGallery();
+}
+function renderGallery(){
+  const paths=galleryPaths(),target=$('gallery-result'),c=target.getContext('2d'),style=$('gallery-frame').value;
+  const basic=['white','black','mono'].includes(style);
+  const background=assets.get(config?.backgrounds?.halloween?.[style]);
+  const ready=paths.length>=4&&paths.slice(0,4).every(path=>assets.has(path));
+  $('gallery-download').disabled=!ready;
+  c.fillStyle=basic?basicPalettes[style].paper:'#201521';c.fillRect(0,0,1200,1560);
+  if(!basic&&background)c.drawImage(background,0,0,1200,1560);
+  if(style==='pink')drawPinkDecorations(c);
+  if(basic){
+    c.textAlign='center';c.fillStyle=basicPalettes[style].ink;c.font=style==='black'?'bold 44px sans-serif':'italic 46px Georgia,serif';c.fillText('HONGOK FILM',600,100);
+  }
+  fourBoxes.forEach((box,i)=>{
+    c.fillStyle=basic?basicPalettes[style].slot:'#e9e1dc';c.fillRect(box.x,box.y,box.w,box.h);
+    const image=assets.get(paths[i]);if(!image)return;
+    const scale=cover(image,box.w,box.h),w=image.naturalWidth*scale,h=image.naturalHeight*scale;
+    c.save();c.beginPath();c.rect(box.x,box.y,box.w,box.h);c.clip();
+    if(style==='mono')c.filter='grayscale(1)';
+    c.drawImage(image,box.x+(box.w-w)/2,box.y,w,h);c.restore();
+  });
+  c.textAlign='center';c.fillStyle=basic?basicPalettes[style].muted:({lime:'#c8bacd',pumpkin:'#d5b6a3',pink:'#cdbcc3'}[style]);
+  c.font='26px sans-serif';c.fillText(galleryEntry()?.name??'',600,1470);
+  c.font='16px sans-serif';c.fillText('HONGOK FILM  ·  HALLOWEEN COLLECTION',600,1515);
+}
+function selectView(view){
+  const gallery=view==='gallery';$('studio-view').hidden=gallery;$('gallery-view').hidden=!gallery;
+  [$('studio-tab'),$('gallery-tab')].forEach((tab,i)=>{const active=gallery?i===1:i===0;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;});
+  if(gallery){if($('camera-dialog').open)$('camera-dialog').close();renderGallery();}
+}
+$('studio-tab').onclick=()=>selectView('studio');$('gallery-tab').onclick=()=>selectView('gallery');
+[$('studio-tab'),$('gallery-tab')].forEach(tab=>tab.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const gallery=e.key==='End'||(e.key!=='Home'&&tab===$('studio-tab'));selectView(gallery?'gallery':'studio');(gallery?$('gallery-tab'):$('studio-tab')).focus();}});
+$('gallery-frame').onchange=renderGallery;
+$('gallery-download').onclick=()=>{
+  const jpg=$('gallery-format').value==='jpg';renderGallery();
+  $('gallery-result').toBlob(blob=>{
+    if(!blob){$('gallery-status').textContent='저장하지 못했어요. 다시 시도해주세요.';return;}
+    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`${galleryCharacter}-halloween-four-${Date.now()}.${jpg?'jpg':'png'}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
+    $('gallery-status').textContent='캐릭터 네컷 이미지 저장을 요청했어요.';
+  },jpg?'image/jpeg':'image/png',.95);
+};
