@@ -30,6 +30,19 @@ function drawCustomPose(pose,b,c=ctx){
   c.translate(b.x+b.w*(wide?.75:.76)+pose.x,(fillWide?b.y+h/2:b.y+b.h-h/2)+pose.y);c.scale(pose.mirror?-1:1,1);
   c.drawImage(pose.image,-w/2,-h/2,w,h);c.restore();
 }
+function registeredPose(index){
+  if(character==='custom')return null;
+  const entry=config?.characters[character];
+  const set=entry?.pose_sets?.[frame==='halloween'?'halloween':'basic'];
+  const path=set?.length?set[index%set.length]:entry?.poses?.[index];
+  return assets.get(path);
+}
+function drawRegisteredPose(image,b,c=ctx){
+  const width=b.w/2,scale=Math.max(width/image.naturalWidth,b.h/image.naturalHeight);
+  const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
+  c.save();c.beginPath();c.rect(b.x+width,b.y,width,b.h);c.clip();
+  c.drawImage(image,b.x+width+(width-w)/2,b.y,w,h);c.restore();
+}
 function updateCharacterUI(){
   const custom=character==='custom';
   $('custom-character').setAttribute('aria-pressed',String(custom));
@@ -181,12 +194,12 @@ function draw(forExport=false) {
     if(mode==='together') {
       ctx.save();
       if(frame==='miniroom'){ctx.beginPath();ctx.rect(b.x+b.w/2,b.y,b.w/2,b.h);ctx.clip();}
-      const pose = character==='custom'?null:assets.get(config?.characters[character]?.poses[i]);
+      const pose=registeredPose(i);
       if(character==='custom'){
         if(customPoses[i])drawCustomPose(customPoses[i],b);
         else {ctx.fillStyle='#766782';ctx.font='18px sans-serif';ctx.fillText('내 캐릭터를 올려주세요',b.x+b.w*.73,b.y+b.h-30);}
       } else
-      if(pose) {ctx.save();ctx.beginPath();ctx.rect(b.x,b.y,b.w,b.h);ctx.clip();ctx.drawImage(pose,b.x,b.y,b.w,b.h);ctx.restore();}
+      if(pose) {drawRegisteredPose(pose,b);}
       else {
         ctx.save();ctx.beginPath();ctx.rect(b.x+b.w*(frame==='miniroom'?.5:.57),b.y,b.w*(frame==='miniroom'?.5:.43),b.h);ctx.clip();
         ctx.fillStyle='#bea9ca99';ctx.fillRect(b.x+b.w*(frame==='miniroom'?.5:.57),b.y,b.w*(frame==='miniroom'?.5:.43),b.h);
@@ -293,9 +306,11 @@ function renderCameraCharacter(){
   const filter=monochrome?'grayscale(1)':frame==='miniroom'?cyworldFilter():'none';
   $('video').style.filter=filter;c.filter=filter;
   const custom=mode==='together'&&character==='custom'&&customPoses[selected];
-  preview.hidden=!custom;
-  $('camera-guide').hidden=mode!=='together'||Boolean(custom);
+  const registered=mode==='together'?registeredPose(selected):null;
+  preview.hidden=!custom&&!registered;
+  $('camera-guide').hidden=mode!=='together'||Boolean(custom||registered);
   if(custom)drawCustomPose(custom,{x:0,y:0,w:box.w,h:box.h},c);
+  else if(registered)drawRegisteredPose(registered,{x:0,y:0,w:box.w,h:box.h},c);
 }
 function updateCameraLabel(){
   $('camera-label').textContent=`${selected+1}번째 사진 촬영 · ${mode==='together'?(character==='custom'?'내 캐릭터':(config?.characters[character]?.name??''))+'와 함께':'혼자 찍기'}`;
@@ -362,8 +377,8 @@ $('repeat-character').onclick=()=>{
 async function init(){
   try{await document.fonts.load('29px "Hongok Hand"');}catch{}
   try{
-    const response=await fetch('./assets/frames.json?v=20261021.1');if(!response.ok)throw new Error('config');config=await response.json();
-    const paths=[...config.characters.flatMap(c=>c.poses),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
+    const response=await fetch('./assets/frames.json?v=20261021.2');if(!response.ok)throw new Error('config');config=await response.json();
+    const paths=[...config.characters.flatMap(c=>[...c.poses,...Object.values(c.pose_sets??{}).flat()]),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
   }catch{status('캐릭터 설정을 불러오지 못했어요. 페이지를 새로고침해주세요.');}

@@ -18,7 +18,19 @@
         null,
         null,
         null
-      ]
+      ],
+      "pose_sets": {
+        "basic": [
+          "assets/characters/min/basic/01.png",
+          "assets/characters/min/basic/02.png"
+        ],
+        "halloween": [
+          "assets/characters/min/halloween/01.jpg",
+          "assets/characters/min/halloween/02.jpg",
+          "assets/characters/min/halloween/03.jpg",
+          "assets/characters/min/halloween/04.jpg"
+        ]
+      }
     },
     {
       "id": "ok",
