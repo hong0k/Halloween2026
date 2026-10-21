@@ -21,6 +21,10 @@
           "assets/characters/kim/basic/02.png",
           "assets/characters/kim/basic/03.png",
           "assets/characters/kim/basic/04.png"
+        ],
+        "miniroom": [
+          "assets/characters/kim/basic/01.png",
+          "assets/characters/kim/basic/04.png"
         ]
       }
     },
