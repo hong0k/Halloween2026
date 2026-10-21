@@ -61,6 +61,12 @@
           "assets/characters/ok/halloween/02.jpg",
           "assets/characters/ok/halloween/03.jpg",
           "assets/characters/ok/halloween/04.jpg"
+        ],
+        "basic": [
+          "assets/characters/ok/basic/옥태석-01.png",
+          "assets/characters/ok/basic/옥태석-02.png",
+          "assets/characters/ok/basic/옥태석-03.png",
+          "assets/characters/ok/basic/옥태석-04.png"
         ]
       }
     },
