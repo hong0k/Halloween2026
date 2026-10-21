@@ -97,6 +97,7 @@
     }
   },
   "decoration_sources": {
-    "pink": "assets/pink-ornaments-source.png"
+    "pink": "assets/pink-ornaments-source.png",
+    "cyworld_tape": "assets/decorations/cyworld/tapes/ivory-tape.png"
   }
 }

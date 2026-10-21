@@ -165,6 +165,14 @@ function drawMiniroomDetails(){
     ctx.fillText(i===0?'남푠♡마누라 – 바람피면 주거 ㅋㅋ':'우리의 이야기는 아직 진행 중。',600,b.y+b.h+40);
   });
   ctx.textAlign='center';ctx.fillStyle='#b2a3ad';ctx.font='24px "Hongok Hand",sans-serif';ctx.fillText('┌  오늘의 우리를, 오래오래 기억할게  ┘',600,1413);
+  const tape=assets.get(config?.decoration_sources?.cyworld_tape);
+  if(tape){
+    for(const [x,y,angle] of [[1050,290,.18],[150,1310,-.22]]){
+      ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.globalAlpha=.82;
+      const h=190*tape.naturalHeight/tape.naturalWidth;
+      ctx.drawImage(tape,-95,-h/2,190,h);ctx.restore();
+    }
+  }
 }
 function draw(forExport=false) {
   ctx.fillStyle=frame==='halloween'?'#392342':basicPalettes[basicStyle].paper;ctx.fillRect(0,0,1200,1560);
@@ -413,7 +421,7 @@ $('repeat-character').onclick=()=>{
 async function init(){
   try{await document.fonts.load('29px "Hongok Hand"');}catch{}
   try{
-    const response=await fetch('./assets/frames.json?v=20261021.18');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261021.19');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>[...c.poses,...Object.values(c.pose_sets??{}).flat()]),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
