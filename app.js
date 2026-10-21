@@ -20,7 +20,7 @@ function drawPhoto(photo,b,index) {
   photo.x=Math.max(-limitX,Math.min(limitX,photo.x));
   photo.y=Math.max(-limitY,Math.min(limitY,photo.y));
   ctx.save();ctx.beginPath();ctx.rect(b.x,b.y,b.w,b.h);ctx.clip();
-  ctx.translate(area.x+area.w/2+photo.x,area.y+area.h/2+photo.y);ctx.scale(photo.mirror?-1:1,1);ctx.drawImage(photo.image,-iw/2,-ih/2,iw,ih);ctx.restore();
+  ctx.translate(area.x+area.w/2+photo.x,area.y+area.h/2+photo.y);ctx.rotate(photo.rotation??0);ctx.scale(photo.mirror?-1:1,1);ctx.drawImage(photo.image,-iw/2,-ih/2,iw,ih);ctx.restore();
 }
 function editable(){return $('edit-layer').value==='character'&&character==='custom'&&mode==='together'?customPoses[selected]:photos[selected];}
 function drawCustomPose(pose,b,c=ctx){
@@ -29,7 +29,7 @@ function drawCustomPose(pose,b,c=ctx){
   const scale=(fillWide?Math.max(b.w*.5/pose.image.naturalWidth,b.h/pose.image.naturalHeight):Math.min(b.w*(wide?.5:.48)/pose.image.naturalWidth,b.h*(wide?1:.93)/pose.image.naturalHeight))*pose.zoom;
   const w=pose.image.naturalWidth*scale,h=pose.image.naturalHeight*scale;
   c.save();c.beginPath();c.rect(wide?b.x+b.w*.5:b.x,b.y,wide?b.w*.5:b.w,b.h);c.clip();
-  c.translate(b.x+b.w*(wide?.75:.76)+pose.x,(fillWide?b.y+h/2:b.y+b.h-h/2)+pose.y);c.scale(pose.mirror?-1:1,1);
+  c.translate(b.x+b.w*(wide?.75:.76)+pose.x,(fillWide?b.y+h/2:b.y+b.h-h/2)+pose.y);c.rotate(pose.rotation??0);c.scale(pose.mirror?-1:1,1);
   c.drawImage(pose.image,-w/2,-h/2,w,h);c.restore();
 }
 function registeredPose(index){
@@ -264,7 +264,7 @@ boxes.forEach((b,i)=>{
     const item=editable(),points=[...pointers.values()];
     if(!item||!points.length){gesture=null;return;}
     const a=points[0],b=points[1]??a;
-    gesture={item,x:(a.x+b.x)/2,y:(a.y+b.y)/2,distance:Math.hypot(a.x-b.x,a.y-b.y),px:item.x,py:item.y,zoom:item.zoom};
+    gesture={item,x:(a.x+b.x)/2,y:(a.y+b.y)/2,distance:Math.hypot(a.x-b.x,a.y-b.y),px:item.x,py:item.y,zoom:item.zoom,rotation:item.rotation??0,angle:Math.atan2(b.y-a.y,b.x-a.x)};
   };
   el.onpointerdown=(e)=>{select(i);if(!editable())return;e.preventDefault();el.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});baseline();};
   el.onpointermove=(e)=>{
@@ -276,6 +276,8 @@ boxes.forEach((b,i)=>{
     item.y=gesture.py+((a.y+b.y)/2-gesture.y)*scale;
     if(points.length>1&&gesture.distance>0){
       item.zoom=Math.max(.3,Math.min(3,gesture.zoom*Math.hypot(a.x-b.x,a.y-b.y)/gesture.distance));
+      const angle=Math.atan2(b.y-a.y,b.x-a.x)-gesture.angle;
+      item.rotation=gesture.rotation+Math.atan2(Math.sin(angle),Math.cos(angle));
       $('zoom').value=item.zoom;$('zoom-value').textContent=Math.round(item.zoom*100)+'%';
     }
     draw();
@@ -286,7 +288,7 @@ boxes.forEach((b,i)=>{
 });
 }
 buildSlots();
-function setPhoto(image,index){photos[index]={image,x:0,y:0,zoom:1,mirror:false};}
+function setPhoto(image,index){photos[index]={image,x:0,y:0,zoom:1,mirror:false,rotation:0};}
 $('upload').onchange=async(e)=>{
   const files=[...e.target.files];if(!files.length)return;
   const targets=[selected,...boxes.map((_,i)=>i).filter(i=>i!==selected&&!photos[i])];
@@ -300,7 +302,7 @@ $('upload').onchange=async(e)=>{
 };
 $('zoom').oninput=()=>{if(editable())editable().zoom=Number($('zoom').value);$('zoom-value').textContent=Math.round(Number($('zoom').value)*100)+'%';draw();};
 $('mirror').onchange=()=>{if(editable())editable().mirror=$('mirror').checked;draw();};
-$('center').onclick=()=>{if(editable())Object.assign(editable(),{x:0,y:0,zoom:1,mirror:false});select(selected);draw();};
+$('center').onclick=()=>{if(editable())Object.assign(editable(),{x:0,y:0,zoom:1,mirror:false,rotation:0});select(selected);draw();};
 $('remove').onclick=()=>{if($('edit-layer').value==='character')customPoses[selected]=null;else photos[selected]=null;select(selected);draw();status('선택한 이미지를 지웠어요.');};
 $('reset').onclick=()=>{if((photos.some(Boolean)||customPoses.some(Boolean))&&!window.confirm('추가한 사진·내 캐릭터·문구를 모두 지울까요?'))return;photos.fill(null);customPoses.fill(null);$('caption').value='';select(0);draw();status('새로운 추억을 시작해요.');};
 $('caption').oninput=draw;
@@ -402,7 +404,7 @@ async function uploadCharacter(event,singleSlot){
   for(let i=0;i<Math.min(files.length,singleSlot?1:boxes.length);i++){
     const url=URL.createObjectURL(files[i]);
     try{
-      const image=await imageFrom(url);const pose={image,x:0,y:0,zoom:1,mirror:false};
+      const image=await imageFrom(url);const pose={image,x:0,y:0,zoom:1,mirror:false,rotation:0};
       if(!singleSlot&&files.length===1)for(let j=0;j<4;j++)customPoses[j]={...pose};
       else customPoses[singleSlot?selected:i]=pose;
       loaded++;
@@ -421,7 +423,7 @@ $('repeat-character').onclick=()=>{
 async function init(){
   try{await document.fonts.load('29px "Hongok Hand"');}catch{}
   try{
-    const response=await fetch('./assets/frames.json?v=20261021.21');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261021.22');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>[...c.poses,...Object.values(c.pose_sets??{}).flat()]),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
