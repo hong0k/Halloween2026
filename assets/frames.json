@@ -15,6 +15,12 @@
           "assets/characters/kim/halloween/02.jpg",
           "assets/characters/kim/halloween/03.jpg",
           "assets/characters/kim/halloween/04.jpg"
+        ],
+        "basic": [
+          "assets/characters/kim/basic/01.png",
+          "assets/characters/kim/basic/02.png",
+          "assets/characters/kim/basic/03.png",
+          "assets/characters/kim/basic/04.png"
         ]
       }
     },
