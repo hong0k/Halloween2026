@@ -213,7 +213,7 @@ function draw(forExport=false) {
   ctx.textAlign='center';ctx.fillStyle=frame==='halloween'?'#f7bf83':'#3e2e44';ctx.font='bold 32px sans-serif';if(frame==='basic')drawBasicHeader();
   ctx.save();if(frame==='basic'&&basicStyle==='mono')ctx.filter='grayscale(1)';else if(frame==='miniroom')ctx.filter=cyworldFilter();
   boxes.forEach((b,i) => {
-    ctx.fillStyle=frame==='halloween'?'#e5d4c7':frame==='miniroom'?'#F5EFE6':basicPalettes[basicStyle].slot;ctx.fillRect(b.x,b.y,b.w,b.h);
+    ctx.fillStyle=frame==='halloween'?'#e5d4c7':frame==='miniroom'?'#F7F5F1':basicPalettes[basicStyle].slot;ctx.fillRect(b.x,b.y,b.w,b.h);
     if(photos[i]) drawPhoto(photos[i],b,i);
     else {ctx.fillStyle='#84758b';ctx.font='26px sans-serif';ctx.fillText(`＋ ${i+1}번째 사진`,b.x+b.w/2,b.y+b.h/2);}
     if(mode==='together') {
@@ -421,7 +421,7 @@ $('repeat-character').onclick=()=>{
 async function init(){
   try{await document.fonts.load('29px "Hongok Hand"');}catch{}
   try{
-    const response=await fetch('./assets/frames.json?v=20261021.19');if(!response.ok)throw new Error('config');config=await response.json();
+    const response=await fetch('./assets/frames.json?v=20261021.20');if(!response.ok)throw new Error('config');config=await response.json();
     const paths=[...config.characters.flatMap(c=>[...c.poses,...Object.values(c.pose_sets??{}).flat()]),...Object.values(config.overlays),...Object.values(config.decoration_sources??{}),...Object.values(config.backgrounds??{}).flatMap(value=>value&&typeof value==='object'?Object.values(value):[value])].filter(Boolean);
     await Promise.all([...new Set(paths)].map(async path=>{try{assets.set(path,await imageFrom(new URL(path,document.baseURI).href));}catch{status('일부 프레임을 불러오지 못해 임시 디자인을 표시해요.');}}));
     config.characters.forEach((c,i)=>{const button=document.createElement('button');button.textContent=c.name;button.classList.toggle('active',i===character);button.setAttribute('aria-pressed',String(i===character));button.onclick=()=>{character=i;updateCharacterUI();select(selected);draw();updateCameraLabel();};$('characters').append(button);});
